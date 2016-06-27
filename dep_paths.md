@@ -1,13 +1,13 @@
 # A key for the NLP dep_paths codes
 
-Code | Meaning | Description
--------|--------|------
-acomp | adjectival complement. An adjectival complement of a verb is an adjectival phrase which functions as the complement (like an object of the verb). 
-advcl | adverbial clause modifier. An adverbial clause modifier of a VP or S is a clause modifying the verb (temporal clause, consequence, conditional clause, purpose clause, etc.).
-advmod | adverb modifier. An adverb modifier of a word is a (non-clausal) adverb or adverb-headed phrase that serves to modify the meaning of the word.
-agent | agent. An agent is the complement of a passive verb which is introduced by the preposition “by” and does the action. This relation only appears in the collapsed dependencies, where it can replace prep by, where appropriate. It does not appear in basic dependencies output.
-amod | adjectival modifier. An adjectival modifier of an NP is any adjectival phrase that serves to modify the meaning of the NP.
-appos | appositional modifier. An appositional modifier of an NP is an NP immediately to the right of the first NP that serves to define or modify that NP. It includes parenthesized examples, as well as defining abbreviations in one of these structures.
-aux | auxiliary. An auxiliary of a clause is a non-main verb of the clause, e.g., a modal auxiliary, or a form of “be”, “do” or “have” in a periphrastic tense.
+Code | Meaning | Description | Example
+-------|--------|------|-----
+acomp | adjectival complement | An adjectival complement of a verb is an adjectival phrase which functions as the complement (like an object of the verb). 
+advcl | adverbial clause modifier | An adverbial clause modifier of a VP or S is a clause modifying the verb (temporal clause, consequence, conditional clause, purpose clause, etc.).
+advmod | adverb modifier | An adverb modifier of a word is a (non-clausal) adverb or adverb-headed phrase that serves to modify the meaning of the word.
+agent | agent | An agent is the complement of a passive verb which is introduced by the preposition “by” and does the action. This relation only appears in the collapsed dependencies, where it can replace prep by, where appropriate. It does not appear in basic dependencies output.
+amod | adjectival modifier | An adjectival modifier of an NP is any adjectival phrase that serves to modify the meaning of the NP.
+appos | appositional modifier | An appositional modifier of an NP is an NP immediately to the right of the first NP that serves to define or modify that NP. It includes parenthesized examples, as well as defining abbreviations in one of these structures.
+aux | auxiliary | An auxiliary of a clause is a non-main verb of the clause, e.g., a modal auxiliary, or a form of “be”, “do” or “have” in a periphrastic tense.
 auxpass | passive auxiliary. A passive auxiliary of a clause is a non-main verb of the clause which contains the passive information.
-cc | coordination. A coordination is the relation between an element of a conjunct and the coordinating conjunction word of the conjunct. (Note: different dependency grammars have different treatments of coordination. We take one conjunct of a conjunction (normally the first) as the head of the conjunction.) A conjunction may also appear at the beginning of a sentence. This is also called a cc, and dependent on the root predicate of the sentence.
+cc | coordination | A coordination is the relation between an element of a conjunct and the coordinating conjunction word of the conjunct. (Note: different dependency grammars have different treatments of coordination. We take one conjunct of a conjunction (normally the first) as the head of the conjunction.) A conjunction may also appear at the beginning of a sentence. This is also called a cc, and dependent on the root predicate of the sentence.
