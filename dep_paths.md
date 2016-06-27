@@ -3,7 +3,8 @@
 
 Code | Meaning | Description | Examples
 -------|--------|------|-----
-acomp | adjectival complement | An adjectival complement of a verb is an adjectival phrase which functions as the complement (like an object of the verb). | "She looks very beautiful" acomp(looks --> beautiful)
+acomp | adjectival complement | An adjectival complement of a verb is an adjectival phrase which functions as the complement (like an object of the verb). 
+"She looks very beautiful" acomp(looks --> beautiful)
 advcl | adverbial clause modifier | An adverbial clause modifier of a VP or S is a clause modifying the verb (temporal clause, consequence, conditional clause, purpose clause, etc.). | “The accident happened as the night was falling” advcl(happened, falling); “If you know who did it, you should tell the teacher” advcl(tell, know) ; “He talked to him in order to secure the account” advcl(talked, secure)
 advmod | adverb modifier | An adverb modifier of a word is a (non-clausal) adverb or adverb-headed phrase that serves to modify the meaning of the word. | “Genetically modified food” advmod(modified, genetically); “less often” advmod(often, less)
 agent | agent | An agent is the complement of a passive verb which is introduced by the preposition “by” and does the action. This relation only appears in the collapsed dependencies, where it can replace prep by, where appropriate. It does not appear in basic dependencies output. | “The man has been killed by the police” agent(killed, police); “Effects caused by the protein are important” agent(caused, protein)
