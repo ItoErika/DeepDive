@@ -3,7 +3,7 @@
 Code | Definition
 ---------- | ----------
 $ | Dollar
-``| opening quotation mark
+`` | opening quotation mark
 " | ] closing quotation mark
 ( | opening parenthesis
 ) | closing parenthesis
