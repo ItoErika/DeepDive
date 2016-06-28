@@ -64,14 +64,26 @@ appos | appositional modifier | An appositional modifier of an NP is an NP immed
 
 **Examples:**
 ````
-"Sam , my brother , arrived"                             appos(Sam --> brother) 
+"Sam , my brother , arrived"                             appos(Sam -> brother) 
 
-"The Australian Broadcasting Corporation ( ABC )"        appos(Corporation --> ABC)
+"Bill (John's cousin)"                                   appos (Bill -> cousin)
+
+"The Australian Broadcasting Corporation ( ABC )"        appos(Corporation -> ABC)
 ````
 
 Code | Meaning | Description 
 -----|-----|-----
-aux | auxiliary | An auxiliary of a clause is a non-main verb of the clause, e.g., a modal auxiliary, or a form of “be”, “do” or “have” in a periphrastic tense. | "Reagan has died" aux(died --> has); "He should leave" aux(leave-->should)
+aux | auxiliary | An auxiliary of a clause is a non-main verb of the clause, e.g., a modal auxiliary, or a form of “be”, “do” or “have” in a periphrastic tense. 
+
+**Examples:**
+````
+"Reagan has died"                                        aux(died --> has)
+
+"He should leave"                                        aux(leave-->should)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
 auxpass | passive auxiliary | A passive auxiliary of a clause is a non-main verb of the clause which contains the passive information.  
 
 **Examples:**
@@ -177,7 +189,7 @@ discourse | discourse element | This is used for interjections and other discour
 
 **Example:**
 ````
-Iguazu is in Argentina :)                                discourse(is-->:))
+Iguazu is in Argentina :)                                discourse(is->:))
 ````
 
 Code | Meaning | Description 
@@ -196,4 +208,35 @@ expl| expletive | This relation captures an existential “there”. The main ve
 **Example:**
 ````
 “There is a ghost in the room”                           expl(is, There)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+goeswith | goes with |This relation links two parts of a word that are separated in text that is not well edited. We follow the treebank: The GW part is the dependent and the head is in some sense the “main” part, often the second
+part.
+
+**Example:**
+````
+"They come here with out legal permission"               out->goeswith->with
+```
+
+Code | Meaning | Description 
+-----|-----|-----
+iobj | indirect object | The indirect object of a VP is the noun phrase which is the (dative) object of the verb.
+
+**Example:**
+````
+"She gave me a raise”                                    iobj(gave, me)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+mark | marker | A marker is the word introducing a finite clause subordinate to another clause. For a complement clause,
+this will typically be “that” or “whether”. For an adverbial clause, the marker is typically a preposition like “while” or “although”. The mark is a dependent of the subordinate clause head. 
+
+**Examples:**
+````
+"Forces engaged in fighting after insurgents attacked"  attacked->mark->after
+
+"He says that you like to swim"                         swim->mark->that
 ````
