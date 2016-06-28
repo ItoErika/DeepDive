@@ -135,7 +135,7 @@ csubj | clausal subject | A clausal subject is a clausal syntactic subject of a 
 
 **Examples:**
 ````
-In the two following examples, “what she said” is the subject.
+*In the two following examples, “what she said” is the subject.
 “What she said makes sense”                              csubj(makes, said) 
 
 “What she said is not true”                              csubj(true, said)
@@ -143,9 +143,57 @@ In the two following examples, “what she said” is the subject.
 
 Code | Meaning | Description 
 -----|-----|-----
-csubjpass | clausal passive subject | A clausal passive subject is a clausal syntactic subject of a passive clause. | In the example below, “that she lied” is the subject. “That she lied was suspected by everyone” csubjpass(suspected, lied)
-dep | dependent | A dependency is labeled as dep when the system is unable to determine a more precise dependency relation between two words. This may be because of a weird grammatical construction, a limitation in the Stanford Dependency conversion software, a parser error, or because of an unresolved long distance dependency. |“Then, as if to show that he could, . . . ” dep(show, if)
-det | determiner | A determiner is the relation between the head of an NP and its determiner. | “The man is here” det(man, the); “Which book do you prefer?” det(book, which)
-discourse | discourse element | This is used for interjections and other discourse particles and elements (which are not clearly linked to the structure of the sentence, except in an expressive way). We generally follow the guidelines of what the Penn Treebanks count as an INTJ. They define this to include: interjections (oh, uh-huh, Welcome), fillers (um, ah), and discourse markers (well, like, actually, but not you know). | Iguazu is in Argentina :) discourse(is-->:))
-dobj | direct object | The direct object of a VP is the noun phrase which is the (accusative) object of the verb. | “She gave me a raise” dobj(gave, raise); “They win the lottery” dobj(win, lottery)
-expl| expletive | This relation captures an existential “there”. The main verb of the clause is the governor. | “There is a ghost in the room” expl(is, There)
+csubjpass | clausal passive subject | A clausal passive subject is a clausal syntactic subject of a passive clause.  
+
+**Example:**
+````
+*In the example below, “that she lied” is the subject. 
+“That she lied was suspected by everyone”                csubjpass(suspected, lied)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+dep | dependent | A dependency is labeled as dep when the system is unable to determine a more precise dependency relation between two words. This may be because of a weird grammatical construction, a limitation in the Stanford Dependency conversion software, a parser error, or because of an unresolved long distance dependency. 
+
+**Example:**
+````
+“Then, as if to show that he could, . . . ”              dep(show, if)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+det | determiner | A determiner is the relation between the head of an NP and its determiner. 
+
+**Examples:**
+````
+“The man is here”                                        det(man, the)
+
+“Which book do you prefer?”                              det(book, which)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+discourse | discourse element | This is used for interjections and other discourse particles and elements (which are not clearly linked to the structure of the sentence, except in an expressive way). We generally follow the guidelines of what the Penn Treebanks count as an INTJ. They define this to include: interjections (oh, uh-huh, Welcome), fillers (um, ah), and discourse markers (well, like, actually, but not you know). 
+
+**Example:**
+````
+Iguazu is in Argentina :)                                discourse(is-->:))
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+dobj | direct object | The direct object of a VP is the noun phrase which is the (accusative) object of the verb.  
+
+**Examples:**
+````
+“She gave me a raise”                                    dobj(gave, raise)
+
+“They win the lottery”                                   dobj(win, lottery)
+````
+
+expl| expletive | This relation captures an existential “there”. The main verb of the clause is the governor. 
+
+**Example:**
+````
+“There is a ghost in the room”                           expl(is, There)
+````
