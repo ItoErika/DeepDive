@@ -135,12 +135,14 @@ csubj | clausal subject | A clausal subject is a clausal syntactic subject of a 
 
 **Examples:**
 ````
-<u>In the two following examples, “what she said” is the subject.<u/> 
+In the two following examples, “what she said” is the subject.
 “What she said makes sense”                              csubj(makes, said) 
 
 “What she said is not true”                              csubj(true, said)
 ````
 
+Code | Meaning | Description 
+-----|-----|-----
 csubjpass | clausal passive subject | A clausal passive subject is a clausal syntactic subject of a passive clause. | In the example below, “that she lied” is the subject. “That she lied was suspected by everyone” csubjpass(suspected, lied)
 dep | dependent | A dependency is labeled as dep when the system is unable to determine a more precise dependency relation between two words. This may be because of a weird grammatical construction, a limitation in the Stanford Dependency conversion software, a parser error, or because of an unresolved long distance dependency. |“Then, as if to show that he could, . . . ” dep(show, if)
 det | determiner | A determiner is the relation between the head of an NP and its determiner. | “The man is here” det(man, the); “Which book do you prefer?” det(book, which)
