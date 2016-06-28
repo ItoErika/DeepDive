@@ -7,7 +7,7 @@ acomp | adjectival complement | An adjectival complement of a verb is an adjecti
 
 **Examples:**
 ````
-"She looks very beautiful"                              acomp(looks -> beautiful)
+"She looks very beautiful"                               acomp(looks -> beautiful)
 ````
 
 Code | Meaning | Description 
@@ -29,14 +29,45 @@ advmod | adverb modifier | An adverb modifier of a word is a (non-clausal) adver
 
 **Examples:**
 ````
-“Genetically modified food”                             advmod(modified, genetically) 
+“Genetically modified food”                              advmod(modified, genetically) 
 
-“less often”                                            advmod(often, less)
+“less often”                                             advmod(often, less)
 ````
 
-agent | agent | An agent is the complement of a passive verb which is introduced by the preposition “by” and does the action. This relation only appears in the collapsed dependencies, where it can replace prep by, where appropriate. It does not appear in basic dependencies output. | “The man has been killed by the police” agent(killed, police); “Effects caused by the protein are important” agent(caused, protein)
-amod | adjectival modifier | An adjectival modifier of an NP is any adjectival phrase that serves to modify the meaning of the NP. | “Sam eats red meat” amod(meat, red); “Sam took out a 3 million dollar loan” amod(loan, dollar); “Sam took out a $ 3 million loan” amod(loan, $)
-appos | appositional modifier | An appositional modifier of an NP is an NP immediately to the right of the first NP that serves to define or modify that NP. It includes parenthesized examples, as well as defining abbreviations in one of these structures. | "Sam , my brother , arrived" appos (Sam --> brother); "The Australian Broadcasting Corporation ( ABC )" appos(Corporation --> ABC)
+Code | Meaning | Description 
+-----|-----|-----
+agent | agent | An agent is the complement of a passive verb which is introduced by the preposition “by” and does the action. This relation only appears in the collapsed dependencies, where it can replace prep by, where appropriate. It does not appear in basic dependencies output.  
+
+**Examples:**
+````
+“The man has been killed by the police”                  agent(killed, police) 
+
+“Effects caused by the protein are important”            agent(caused, protein)
+````
+
+amod | adjectival modifier | An adjectival modifier of an NP is any adjectival phrase that serves to modify the meaning of the NP. 
+
+**Examples:**
+````
+“Sam eats red meat”                                      amod(meat, red) 
+
+“Sam took out a 3 million dollar loan”                   amod(loan, dollar)
+
+“Sam took out a $ 3 million loan”                        amod(loan, $)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+appos | appositional modifier | An appositional modifier of an NP is an NP immediately to the right of the first NP that serves to define or modify that NP. It includes parenthesized examples, as well as defining abbreviations in one of these structures.  
+
+**Examples:**
+````
+"Sam , my brother , arrived"                            appos(Sam --> brother) 
+
+"The Australian Broadcasting Corporation ( ABC )"       appos(Corporation --> ABC)
+````
+
+
 aux | auxiliary | An auxiliary of a clause is a non-main verb of the clause, e.g., a modal auxiliary, or a form of “be”, “do” or “have” in a periphrastic tense. | "Reagan has died" aux(died --> has); "He should leave" aux(leave-->should)
 auxpass | passive auxiliary | A passive auxiliary of a clause is a non-main verb of the clause which contains the passive information. | “Kennedy has been killed” auxpass(killed, been) aux(killed,has); “Kennedy was/got killed” auxpass(killed, was/got)
 cc | coordination | A coordination is the relation between an element of a conjunct and the coordinating conjunction word of the conjunct. (Note: different dependency grammars have different treatments of coordination. We take one conjunct of a conjunction (normally the first) as the head of the conjunction.) A conjunction may also appear at the beginning of a sentence. This is also called a cc, and dependent on the root predicate of the sentence. | “Bill is big and honest” cc(big, and); “They either ski or snowboard” cc(ski, or); “And then we left.” cc(left, And)
