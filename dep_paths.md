@@ -27,9 +27,8 @@ advmod | adverb modifier | An adverb modifier of a word is a (non-clausal) adver
 
 **Examples:**
 ````
-“Genetically modified food” advmod(modified, genetically) 
-
-“less often” advmod (often, less)
+“Genetically modified food”     advmod(modified, genetically) 
+“less often”                    advmod(often, less)
 ````
 
 agent | agent | An agent is the complement of a passive verb which is introduced by the preposition “by” and does the action. This relation only appears in the collapsed dependencies, where it can replace prep by, where appropriate. It does not appear in basic dependencies output. | “The man has been killed by the police” agent(killed, police); “Effects caused by the protein are important” agent(caused, protein)
