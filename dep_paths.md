@@ -235,7 +235,163 @@ mark | marker | A marker is the word introducing a finite clause subordinate to 
 
 **Examples:**
 ````
-"Forces engaged in fighting after insurgents attacked"  attacked->mark->after
+"Forces engaged in fighting after insurgents attacked"   attacked->mark->after
 
-"He says that you like to swim"                         swim->mark->that
+"He says that you like to swim"                          swim->mark->that
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+mwe | multi-word expression |The multi-word expression (modifier) relation is used for certain multi-word idioms that behave like a single function word. It is used for a closed set of dependencies between words in common multi-word expressions for which it seems difficult or unclear to assign any other relationships. At present, this relation is used inside the following expressions: rather than, as well as, instead of, such as, because of, instead of, in addition to, all but, such as, because of, instead of, due to. The boundaries of this class are unclear; it could grow or shrink a little over time.
+
+**Examples:**
+````
+“I like dogs as well as cats"                            mwe(well, as)
+                                                         mwe(well, as)
+
+“He cried because of you”                                mwe(of, because)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+neg | negation modifier | The negation modifier is the relation between a negation word and the word it modifies.
+
+**Examples:**
+````
+“Bill is not a scientist”                                neg(scientist, not)
+
+“Bill doesn’t drive”                                     neg(drive, n’t) 
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+nn | noun compound modifier | A noun compound modifier of an NP is any noun that serves to modify the head noun. (Note that in the current system for dependency extraction, all nouns modify the rightmost noun of the NP – there is no intelligent noun compound analysis. This is likely to be fixed once the Penn Treebank represents the branching structure of NPs.)
+
+**Example:**
+````
+“Oil price futures”                                      nn(futures, oil)
+
+                                                         nn(futures, price)
+````
+
+  Code | Meaning | Description 
+-----|-----|-----
+npadvmod | noun phrase as adverbial modifier | This relation captures various places where something syntactically a noun phrase (NP) is used as an adverbial modifier in a sentence. These usages include: (i) a measure phrase, which is the relation between the head of an ADJP/ADVP/PP and the head of a measure phrase modifying the ADJP/ADVP; (ii) noun phrases giving an extent inside a VP which are not objects; (iii) financial constructions involving an adverbial or PP-like NP, notably the following construction $5 a share, where the second NP means “per share”; (iv) floating reflexives; and (v) certain other absolutive NP constructions. A temporal modifier (tmod) is a subclass of npadvmod which is distinguished as a separate relation.
+
+**Examples:**
+````
+“The director is 65 years old”                           npadvmod(old, years)
+
+“6 feet long”                                            npadvmod(long, feet)
+
+“Shares eased a fraction”                                npadvmod(eased, fraction)
+
+“IBM earned $ 5 a share”                                 npadvmod($, share)
+
+“The silence is itself significant”                      npadvmod(significant, itself)
+
+“90% of Australians like him, the most of any country”   npadvmod(like, most)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+nsubj | nominal subject | A nominal subject is a noun phrase which is the syntactic subject of a clause. The governor of this relation might not always be a verb: when the verb is a copular verb, the root of the clause is the complement of the copular verb, which can be an adjective or noun.
+
+**Examples:**
+````
+“Clinton defeated Dole”                                  nsubj(defeated, Clinton)
+
+“The baby is cute”                                       nsubj(cute, baby)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+nsubjpass | passive nominal subject | A passive nominal subject is a noun phrase which is the syntactic subject of a passive clause.
+
+**Example:**
+````
+“Dole was defeated by Clinton”                           nsubjpass(defeated, Dole)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+num | numeric modifier | A numeric modifier of a noun is any number phrase that serves to modify the meaning of the noun with a quantity.
+
+**Examples:**
+````
+“Sam ate 3 sheep”                                        num(sheep, 3)
+
+“Sam spent forty dollars”                                num(dollars, 40)
+
+“Sam spent $ 40”                                         num($, 40)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+number | element of compound number | An element of compound number is a part of a number phrase or currency amount. We regard a number as a specialized kind of multi-word expression.
+**Examples:**
+````
+“I have four thousand sheep”                             number(thousand, four)
+
+“I lost $ 3.2 billion”                                   number(billion, 3.2)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+parataxis | parataxis | The parataxis relation (from Greek for “place side by side”) is a relation between the main verb of a clause and other sentential elements, such as a sentential parenthetical, a clause after a “:” or a “;”, or two sentences placed side by side without any explicit coordination or subordination.
+
+**Examples:**
+````
+“The guy, John said, left early in the morning”          parataxis(left, said)
+
+“Let’s face it we’re annoyed”                            parataxis(Let, annoyed)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+pcomp | prepositional complement | This is used when the complement of a preposition is a clause or prepositional phrase (or occasionally, an adverbial phrase). The prepositional complement of a preposition is the head of a clause following the preposition, or the preposition head of the following PP.
+
+**Examples:**
+````
+“We have no information on whether users are at risk”    pcomp(on, are)
+
+“They heard about you missing classes”                   pcomp(about, missing)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+pobj | object of a preposition | The object of a preposition is the head of a noun phrase following the preposition, or the adverbs “here” and “there”. (The preposition in turn may be modifying a noun, verb, etc.) Unlike the Penn Treebank, we here define cases of VBG quasi-prepositions like “including”, “concerning”, etc. as instances of pobj. (The preposition can be tagged a FW for “pace”, “versus”, etc. It can also be called a CC – but we don’t currently handle that and would need to distinguish from conjoined prepositions.) In the case of preposition stranding, the object can precede the preposition (e.g., “What does CPR stand for?”).
+
+**Example:**
+````
+“I sat on the chair”                                     pobj(on, chair)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+poss | possession modifier | The possession modifier relation holds between the head of an NP and its possessive determiner, or a genitive ’s complement.
+
+**Examples:**
+````
+“their offices”                                          poss(offices, their)
+
+“Bill’s clothes”                                         poss(clothes, Bill)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+possessive | possessive modifier | The possessive modifier relation appears between the head of an NP and the genitive ’s.
+
+**Example:**
+````
+“Bill’s clothes”                                         possessive(John, ’s)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+preconj | preconjunct | A preconjunct is the relation between the head of an NP and a word that appears at the beginning bracketing a conjunction (and puts emphasis on it), such as “either”, “both”, “neither”).
+
+**Example:**
+````
+“Both the boys and the girls are here”                   preconj(boys, both)
 ````
