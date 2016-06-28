@@ -395,3 +395,142 @@ preconj | preconjunct | A preconjunct is the relation between the head of an NP 
 ````
 “Both the boys and the girls are here”                   preconj(boys, both)
 ````
+
+Code | Meaning | Description 
+-----|-----|-----
+predet | predeterminer | A predeterminer is the relation between the head of an NP and a word that precedes and modifies the meaning of the NP determiner.
+
+**Example:**
+````
+“All the boys are here”                                  predet(boys, all)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+prep | prepositional modifier |  A prepositional modifier of a verb, adjective, or noun is any prepositional phrase that serves to modify the meaning of the verb, adjective, noun, or even another prepositon. In the collapsed representation, this is used only for prepositions with NP complements.
+
+**Examples:**
+````
+“I saw a cat in a hat”                                   prep(cat, in)
+
+“I saw a cat with a telescope”                           prep(saw, with)
+
+“He is responsible for meals”                            prep(responsible, for)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+prepc | prepositional clausal modifier | In the collapsed representation (see section 4), a prepositional clausal modifier of a verb, adjective, or noun is a clause introduced by a preposition which serves to modify the meaning of the verb, adjective, or noun.
+
+**Example:**
+````
+“He purchased it without paying a premium”               prepc without(purchased, paying)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+prt | phrasal verb particle | The phrasal verb particle relation identifies a phrasal verb, and holds between the verb and its particle.
+
+**Example:**
+````
+“They shut down the station”                             prt(shut, down)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+punct | punctuation | This is used for any piece of punctuation in a clause, if punctuation is being retained in the typed dependencies. By default, punctuation is not retained in the output.
+
+**Example:**
+````
+“Go home!”                                               punct(Go, !)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+quantmod | quantifier phrase modifier | A quantifier modifier is an element modifying the head of a QP constituent. (These are modifiers in complex numeric quantifiers, not other types of “quantification”. Quantifiers like “all” become det.)
+
+**Example:**
+````
+“About 200 people came to the party”                     quantmod(200, About)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+rcmod | relative clause modifier | A relative clause modifier of an NP is a relative clause modifying the NP. The relation points from the head noun of the NP to the head of the relative clause, normally a verb.
+
+**Examples:**
+````
+“I saw the man you love”                                 rcmod(man, love)
+
+“I saw the book which you bought”                        rcmod(book,bought)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+ref | referent | A referent of the head of an NP is the relative word introducing the relative clause modifying the NP.
+
+**Example:**
+````
+“I saw the book which you bought”                        ref(book, which)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+root | root | The root grammatical relation points to the root of the sentence. A fake node “ROOT” is used as the governor. The ROOT node is indexed with “0”, since the indexation of real words in the sentence starts at 1.
+
+**Examples:**
+````
+“I love French fries.”                                   root(ROOT, love)
+
+“Bill is an honest man”                                  root(ROOT, man)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+tmod | temporal modifier | A temporal modifier (of a VP, NP, or an ADJP is a bare noun phrase constituent that serves to modify the meaning of the constituent by specifying a time. (Other temporal modifiers are prepositional phrases and are introduced as prep.)
+
+**Example:**
+````
+“Last night, I swam in the pool”                         tmod(swam, night)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+vmod | reduced non-finite verbal modifier | A reduced non-finite verbal modifier is a participial or infinitive form of a verb heading a phrase (which may have some arguments, roughly like a VP). These are used to modify the meaning of an NP or another verb. They are not core arguments of a verb or full finite relative clauses.
+
+**Examples:**
+````
+“Points to establish are . . . ”                         vmod(points, establish)
+
+“I don’t have anything to say to you”                    vmod(anything, say)
+
+“Truffles picked during the spring are tasty”            vmod(truffles, picked)
+
+“Bill tried to shoot, demonstrating his incompetence”    vmod(shoot, demonstrating)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+xcomp | open clausal complement | An open clausal complement (xcomp) of a verb or an adjective is a predicative or clausal complement without its own subject. The reference of the subject is necessarily determined by an argument external to the xcomp (normally by the object of the next higher clause, if there is one, or else by the subject of the next higher clause. These complements are always non-finite, and they are complements (arguments of the higher verb or adjective) rather than adjuncts/modifiers, such as a purpose clause. The name xcomp is borrowed from Lexical-Functional Grammar.
+
+**Examples:**
+````
+“He says that you like to swim”                          xcomp(like, swim)
+
+“I am ready to leave”                                    xcomp(ready, leave)
+
+“Sue asked George to respond to her offer”               xcomp(ask, respond)
+
+“I consider him a fool”                                  xcomp(consider, fool)
+
+“I consider him honest”                                  xcomp(consider, honest)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+xsubj | controlling subject | A controlling subject is the relation between the head of a open clausal complement (xcomp) and the external subject of that clause. This is an additional dependency, not a basic depedency.
+
+**Example:**
+````
+“Tom likes to eat fish”                                  xsubj(eat, Tom)
+````
