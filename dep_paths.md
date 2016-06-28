@@ -45,6 +45,8 @@ agent | agent | An agent is the complement of a passive verb which is introduced
 “Effects caused by the protein are important”            agent(caused, protein)
 ````
 
+Code | Meaning | Description 
+-----|-----|-----
 amod | adjectival modifier | An adjectival modifier of an NP is any adjectival phrase that serves to modify the meaning of the NP. 
 
 **Examples:**
@@ -62,19 +64,83 @@ appos | appositional modifier | An appositional modifier of an NP is an NP immed
 
 **Examples:**
 ````
-"Sam , my brother , arrived"                            appos(Sam --> brother) 
+"Sam , my brother , arrived"                             appos(Sam --> brother) 
 
-"The Australian Broadcasting Corporation ( ABC )"       appos(Corporation --> ABC)
+"The Australian Broadcasting Corporation ( ABC )"        appos(Corporation --> ABC)
 ````
 
-
+Code | Meaning | Description 
+-----|-----|-----
 aux | auxiliary | An auxiliary of a clause is a non-main verb of the clause, e.g., a modal auxiliary, or a form of “be”, “do” or “have” in a periphrastic tense. | "Reagan has died" aux(died --> has); "He should leave" aux(leave-->should)
-auxpass | passive auxiliary | A passive auxiliary of a clause is a non-main verb of the clause which contains the passive information. | “Kennedy has been killed” auxpass(killed, been) aux(killed,has); “Kennedy was/got killed” auxpass(killed, was/got)
-cc | coordination | A coordination is the relation between an element of a conjunct and the coordinating conjunction word of the conjunct. (Note: different dependency grammars have different treatments of coordination. We take one conjunct of a conjunction (normally the first) as the head of the conjunction.) A conjunction may also appear at the beginning of a sentence. This is also called a cc, and dependent on the root predicate of the sentence. | “Bill is big and honest” cc(big, and); “They either ski or snowboard” cc(ski, or); “And then we left.” cc(left, And)
-ccomp | clausal complement | A clausal complement of a verb or adjective is a dependent clause with an internal subject which functions like an object of the verb, or adjective. Clausal complements for nouns are limited to complement clauses with a subset of nouns like “fact” or “report”. We analyze them the same (parallel to the analysis of this class as “content clauses” in Huddleston and Pullum 2002). Such clausal complements are usually finite (though there are occasional remnant English subjunctives). | “He says that you like to swim” ccomp(says, like); “I am certain that he did it” ccomp(certain, did); “I admire the fact that you are honest” ccomp(fact, honest)
-conj | conjunct | A conjunct is the relation between two elements connected by a coordinating conjunction, such as “and”, “or”, etc. We treat conjunctions asymmetrically: The head of the relation is the first conjunct and other conjunctions depend on it via the conj relation. | “Bill is big and honest” conj(big, honest); “They either ski or snowboard” conj(ski, snowboard)
-cop | copula | A copula is the relation between the complement of a copular verb and the copular verb. (We normally take a copula as a dependent of its complement; see the discussion in section 4.) | “Bill is big” cop(big, is); “Bill is an honest man” cop(man, is)
-csubj | clausal subject | A clausal subject is a clausal syntactic subject of a clause, i.e., the subject is itself a clause. The governor of this relation might not always be a verb: when the verb is a copular verb, the root of the clause is the complement of the copular verb. | In the two following examples, “what she said” is the subject. “What she said makes sense” csubj(makes, said); “What she said is not true” csubj(true, said)
+auxpass | passive auxiliary | A passive auxiliary of a clause is a non-main verb of the clause which contains the passive information.  
+
+**Examples:**
+````
+“Kennedy has been killed”                                auxpass(killed, been) aux(killed,has) 
+
+“Kennedy was/got killed”                                 auxpass(killed, was/got)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+cc | coordination | A coordination is the relation between an element of a conjunct and the coordinating conjunction word of the conjunct. (Note: different dependency grammars have different treatments of coordination. We take one conjunct of a conjunction (normally the first) as the head of the conjunction.) A conjunction may also appear at the beginning of a sentence. This is also called a cc, and dependent on the root predicate of the sentence. 
+
+**Examples:**
+````
+“Bill is big and honest”                                 cc(big, and)
+
+“They either ski or snowboard”                           cc(ski, or)
+
+“And then we left.”                                      cc(left, And)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+ccomp | clausal complement | A clausal complement of a verb or adjective is a dependent clause with an internal subject which functions like an object of the verb, or adjective. Clausal complements for nouns are limited to complement clauses with a subset of nouns like “fact” or “report”. We analyze them the same (parallel to the analysis of this class as “content clauses” in Huddleston and Pullum 2002). Such clausal complements are usually finite (though there are occasional remnant English subjunctives).  
+
+**Examples:**
+````
+“He says that you like to swim”                          ccomp(says, like)
+
+“I am certain that he did it”                            ccomp(certain, did)
+
+“I admire the fact that you are honest”                  ccomp(fact, honest)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+conj | conjunct | A conjunct is the relation between two elements connected by a coordinating conjunction, such as “and”, “or”, etc. We treat conjunctions asymmetrically: The head of the relation is the first conjunct and other conjunctions depend on it via the conj relation. 
+
+**Examples:**
+````
+“Bill is big and honest”                                 conj(big, honest)
+
+“They either ski or snowboard”                           conj(ski, snowboard)
+````
+
+Code | Meaning | Description 
+-----|-----|-----
+cop | copula | A copula is the relation between the complement of a copular verb and the copular verb. (We normally take a copula as a dependent of its complement; see the discussion in section 4.)  
+
+**Examples:**
+````
+“Bill is big”                                            cop(big, is)
+
+“Bill is an honest man”                                  cop(man, is)
+```` 
+
+Code | Meaning | Description 
+-----|-----|-----
+csubj | clausal subject | A clausal subject is a clausal syntactic subject of a clause, i.e., the subject is itself a clause. The governor of this relation might not always be a verb: when the verb is a copular verb, the root of the clause is the complement of the copular verb. 
+
+**Examples:**
+````
+<u>In the two following examples, “what she said” is the subject.<u/> 
+“What she said makes sense”                              csubj(makes, said) 
+
+“What she said is not true”                              csubj(true, said)
+````
+
 csubjpass | clausal passive subject | A clausal passive subject is a clausal syntactic subject of a passive clause. | In the example below, “that she lied” is the subject. “That she lied was suspected by everyone” csubjpass(suspected, lied)
 dep | dependent | A dependency is labeled as dep when the system is unable to determine a more precise dependency relation between two words. This may be because of a weird grammatical construction, a limitation in the Stanford Dependency conversion software, a parser error, or because of an unresolved long distance dependency. |“Then, as if to show that he could, . . . ” dep(show, if)
 det | determiner | A determiner is the relation between the head of an NP and its determiner. | “The man is here” det(man, the); “Which book do you prefer?” det(book, which)
