@@ -7,18 +7,20 @@ acomp | adjectival complement | An adjectival complement of a verb is an adjecti
 
 Example Sentence | acomp
 ------|------
-"She looks very beautiful"  |  acomp (looks -> beautiful)
+"She looks very beautiful"  |  (looks -> beautiful)
 
 Code | Meaning | Description 
 -----|-----|-----
 advcl | adverbial clause modifier | An adverbial clause modifier of a VP or S is a clause modifying the verb (temporal clause, consequence, conditional clause, purpose clause, etc.). 
-Examples: 
 
-“The accident happened as the night was falling”        advcl(happened, falling) 
+**Examples** 
+````
+“The accident happened as the night was falling”         advcl(happened, falling) 
 
-“If you know who did it, you should tell the teacher”   advcl(tell, know) 
+“If you know who did it, you should tell the teacher”    advcl(tell, know) 
 
-“He talked to him in order to secure the account”       advcl(talked, secure)
+“He talked to him in order to secure the account”        advcl(talked, secure)
+````
 
 Code | Meaning | Description 
 -----|-----|-----
