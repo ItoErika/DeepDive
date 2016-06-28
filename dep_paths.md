@@ -231,8 +231,7 @@ iobj | indirect object | The indirect object of a VP is the noun phrase which is
 
 Code | Meaning | Description 
 -----|-----|-----
-mark | marker | A marker is the word introducing a finite clause subordinate to another clause. For a complement clause,
-this will typically be “that” or “whether”. For an adverbial clause, the marker is typically a preposition like “while” or “although”. The mark is a dependent of the subordinate clause head. 
+mark | marker | A marker is the word introducing a finite clause subordinate to another clause. For a complement clause, this will typically be “that” or “whether”. For an adverbial clause, the marker is typically a preposition like “while” or “although”. The mark is a dependent of the subordinate clause head. 
 
 **Examples:**
 ````
