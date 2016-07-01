@@ -78,7 +78,15 @@ validSentences<-function(Document,Words) {
 clusterExport(cl=Cluster,varlist=c("wordSearch","validSentences"))
 
 #Find sentences that contain the words of interest for all documents
+Start<-Sys.time()
 DocumentSentenceNamesMatches<-parLapply(Cluster,IndividualDocumentsList,validSentences,Words)
+Start-Sys.time()
+#Eliminate the documents without any word matches from DocumentSentenceNamesMatches
+FilteredDocumentSentenceMatches<-sapply(DocumentSentenceNamesMatches,length)
+ActualNamesSentenceMatches<-DocumentSentenceNamesMatches[which(FilteredDocumentSentenceMatches!=0)]
+#WHICH FUNCTION SPITS OUT ELEMENT NUMBERS THAT ARE TRUE!
+
+
 
 ########## Use function to search for words related to fossiliation (specifically replacement) ##############
 #Select words of interest
@@ -88,8 +96,14 @@ Words<-c(Words,gsub("(^[[:alpha:]])", "\\U\\1", Words, perl=TRUE))
 #Run functions to search for instances of words of interest in all documents.
 #Find sentences that contain the words of interest for all documents
 DocumentSentenceFossilizationMatches<-parLapply(Cluster,IndividualDocumentsList,validSentences,Words)
+#Get rid of blank elements in DocumentSentenceFossilizationMatches
+FilteredFossilizationSentenceMatches<-sapply(DocumentSentenceFossilizationMatches,length)
+ActualFossilizationSentenceMatches<-DocumentSentenceFossilizationMatches[which(FilteredFossilizationSentenceMatches!=0)]
 
-
+########################## Determine which articles contain fossil and name words############################
+DocumentMatches<-intersect(names(ActualNamesSentenceMatches),names(ActualFossilizationSentenceMatches))
+IntersectNamesSentenceMatches<-ActualNamesSentenceMatches[DocumentMatches]
+IntersectFossilizationSentenceMatches<-ActualFossilizationSentenceMatches[DocumentMatches]
 
 ######################################### Bad Genus Names ###################################################
 Here
