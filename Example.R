@@ -14,7 +14,7 @@ source("https://raw.githubusercontent.com/aazaff/paleobiologyDatabase.R/master/c
 DataPBDB<-downloadPBDB(Taxa=c("Bivalvia","Brachiopoda"),StartInterval="Cambrian",StopInterval="Holocene")
 
 # Make Core Cluster
-Cluster<-makeCluster(7)
+Cluster<-makeCluster(6)
 
 ##################################### Establish postgresql connection #######################################
 
@@ -68,38 +68,28 @@ wordSearch<-function(Sentence,Words) {
     }
 
 # Make second function to apply the function to all documents
-validSentences1<-function(Document,Words) {
+validSentences<-function(Document,Words) {
     WordSearchResults<-sapply(Document[,"words"],wordSearch,Words)
     PresentWords<-which(WordSearchResults,arr.ind=TRUE)
     return(PresentWords)
     }
 
 # Pass the functions to the cluster
-clusterExport(cl=Cluster,varlist=c("wordSearch","validSentences1"))
+clusterExport(cl=Cluster,varlist=c("wordSearch","validSentences"))
 
 #Find sentences that contain the words of interest for all documents
-DocumentSentenceNamesMatches<-parLapply(Cluster,IndividualDocumentsList,validSentences1,Words)
+DocumentSentenceNamesMatches<-parLapply(Cluster,IndividualDocumentsList,validSentences,Words)
 
 ########## Use function to search for words related to fossiliation (specifically replacement) ##############
 #Select words of interest
-Words<-c("pyrite",,"Pyrite","pyritized","Pyritized","pyritization","Pyritization","pyrititic","Pyrititic","glauconite","Glauconite","chert","Chert","apatite","Apatite","silicification","Silicification","silica","Silica","petrifaction","Petrification","petrification","Petrifaction","replacement","Replacement","phosphatization","Phosphatization","phosphatic","Phosphatic","phosphate","Phosphate","hematite","Hematite","diagenesis","Diagenesis","diagenetic","Diagenetic")
+Words<-c("pyrite","pyritized","pyritization","pyrititic","glauconite","glaucanitic","chert","carbonized","carbonaceous","apatite","silicification","siliceous","silicified","phosphatization","phosphatic","phosphatized","phosphate","hematite","calcified","hematitic")
+#make vector of upper case words
+Words<-c(Words,gsub("(^[[:alpha:]])", "\\U\\1", Words, perl=TRUE))
 #Run functions to search for instances of words of interest in all documents.
-wordSearch<-function(Sentence,Words) {
-    CleanedSentences<-gsub("\\{|\\}|\\.|\\(|\\)|\\—","",Sentence)
-    SplitSentences<-strsplit(CleanedSentences,",")
-    FoundFossilizationWords<-Words%in%unlist(SplitSentences)
-    return(FoundFossilizationWords)
-    }
-validSentences2<-function(Document,Words) {
-    FossilizationWordSearchResults<-sapply(Document[,"words"],wordSearch,Words)
-    PresentWords<-which(FossilizationWordSearchResults,arr.ind=TRUE)
-    return(PresentFossilizationWords)
-    }
-# Pass the functions to the cluster
-clusterExport(cl=Cluster,varlist=c("wordSearch","validSentences2"))
-
 #Find sentences that contain the words of interest for all documents
-DocumentSentenceFossilizationMatches2<-parLapply(Cluster,IndividualDocumentsList,validSentences2,Words)
+DocumentSentenceFossilizationMatches<-parLapply(Cluster,IndividualDocumentsList,validSentences,Words)
+
+
 
 ######################################### Bad Genus Names ###################################################
 Here
