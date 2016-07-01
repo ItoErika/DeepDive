@@ -3,22 +3,27 @@
 # []-notation is used wherever possible, and $-notation is avoided.
 
 
+################################# Load Required Libraries and Download Data #################################
+
+# Load Required Libraries
+library("RPostgreSQL")
+library("doParallel")
+#Designate PBDB as source
+source("https://raw.githubusercontent.com/aazaff/paleobiologyDatabase.R/master/communityMatrix.R")
+#Download list of taxonomic names from PBDB
+DataPBDB<-downloadPBDB(Taxa=c("Bivalvia","Brachiopoda"),StartInterval="Cambrian",StopInterval="Holocene")
+
+# Make Core Cluster
+Cluster<-makeCluster(7)
+
 ##################################### Establish postgresql connection #######################################
 
 # Remember to start postgres (pgadmin) if it is not already running
 Driver <- dbDriver("PostgreSQL") # Establish database driver
 Connection <- dbConnect(Driver, dbname = "erikaito", host = "localhost", port = 5432, user = "erikaito")
 
-################################# Load Required Libraries and Download Data #################################
-
-# Load Required Libraries
-library("RPostgreSQL")
 # Load Data Table Into R 
 DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM pyrite_example_data")
-#Designate PBDB as source
-source("https://raw.githubusercontent.com/aazaff/paleobiologyDatabase.R/master/communityMatrix.R")
-#Download list of taxonomic names from PBDB
-DataPBDB<-downloadPBDB(Taxa=c("Bivalvia","Brachiopoda"),StartInterval="Cambrian",StopInterval="Holocene")
 
 ############################## Search for words in an individual document ##################################
 
@@ -27,6 +32,7 @@ IndividualDocumentsList<-split(DeepDiveData,DeepDiveData[,"docid"])
 FirstDocument<-IndividualDocumentsList[[1]]
 #Choose Word(s)
 Words<-c("pyrite","glauconite","chert","apatite")
+
 #Function time
 wordSearch<-function(Sentence,Words) {
   CleanedSentences<-gsub("\\{|\\}|\\.|\\(|\\)|\\—","",Sentence)
@@ -41,13 +47,18 @@ WordSearchResuls<-sapply(FirstDocument[,"words"],wordSearch,Words)
 which(WordSearchResuls,arr.ind=TRUE) #row number corresponds to Words and column number corresponds to sentences. 
 
 ############################### Search for genus names in all Documents ###################################
+# Split the postgres table into individual documents
+IndividualDocumentsList<-split(DeepDiveData,DeepDiveData[,"docid"])
 
 #Isolate data to get data with genus names
 GenusPBDB<-cleanRank(DataPBDB,Rank="genus")
+
 #Create vector of genus names
 GenusNames<-unique(GenusPBDB[,"genus"])
+
 #Set GenusNames to Words which will be searched for
 Words<-GenusNames
+
 #Create function to return the words found in a sentence
 wordSearch<-function(Sentence,Words) {
     CleanedSentences<-gsub("\\{|\\}|\\.|\\(|\\)|\\—","",Sentence)
@@ -55,17 +66,40 @@ wordSearch<-function(Sentence,Words) {
     FoundWords<-Words%in%unlist(SplitSentences)
     return(FoundWords)
     }
+
 # Make second function to apply the function to all documents
-validSentences<-function(Document,Words) {
+validSentences1<-function(Document,Words) {
     WordSearchResults<-sapply(Document[,"words"],wordSearch,Words)
     PresentWords<-which(WordSearchResults,arr.ind=TRUE)
     return(PresentWords)
     }
+
+# Pass the functions to the cluster
+clusterExport(cl=Cluster,varlist=c("wordSearch","validSentences1"))
+
 #Find sentences that contain the words of interest for all documents
-DocumentSentenceMatches<-lapply(IndividualDocumentsList,validSentences, Words)
+DocumentSentenceNamesMatches<-parLapply(Cluster,IndividualDocumentsList,validSentences1,Words)
 
+########## Use function to search for words related to fossiliation (specifically replacement) ##############
+#Select words of interest
+Words<-c("pyrite",,"Pyrite","pyritized","Pyritized","pyritization","Pyritization","pyrititic","Pyrititic","glauconite","Glauconite","chert","Chert","apatite","Apatite","silicification","Silicification","silica","Silica","petrifaction","Petrification","petrification","Petrifaction","replacement","Replacement","phosphatization","Phosphatization","phosphatic","Phosphatic","phosphate","Phosphate","hematite","Hematite","diagenesis","Diagenesis","diagenetic","Diagenetic")
+#Run functions to search for instances of words of interest in all documents.
+wordSearch<-function(Sentence,Words) {
+    CleanedSentences<-gsub("\\{|\\}|\\.|\\(|\\)|\\—","",Sentence)
+    SplitSentences<-strsplit(CleanedSentences,",")
+    FoundFossilizationWords<-Words%in%unlist(SplitSentences)
+    return(FoundFossilizationWords)
+    }
+validSentences2<-function(Document,Words) {
+    FossilizationWordSearchResults<-sapply(Document[,"words"],wordSearch,Words)
+    PresentWords<-which(FossilizationWordSearchResults,arr.ind=TRUE)
+    return(PresentFossilizationWords)
+    }
+# Pass the functions to the cluster
+clusterExport(cl=Cluster,varlist=c("wordSearch","validSentences2"))
 
-
+#Find sentences that contain the words of interest for all documents
+DocumentSentenceFossilizationMatches2<-parLapply(Cluster,IndividualDocumentsList,validSentences2,Words)
 
 ######################################### Bad Genus Names ###################################################
 Here
