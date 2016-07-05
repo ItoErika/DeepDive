@@ -27,9 +27,9 @@ DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM pyrite_example_data")
 
 ###################################### Load Pre-processed Documents ########################################
 #Load matches of genus names and documents
-ActualNamesSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Names_Sentence_Matches")
+ActualGenusSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Genus_Sentence_Matches")
 #Load matches of pyritization words and documents
-ActualFossilizationSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Fossilization_Sentence_Matches")
+ActualPyriteSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Pyrite_Sentence_Matches")
 
 ############################## Search for words in an individual document ##################################
 
@@ -85,11 +85,11 @@ clusterExport(cl=Cluster,varlist=c("wordSearch","validSentences"))
 
 #Find sentences that contain the words of interest for all documents
 Start<-Sys.time()
-DocumentSentenceNamesMatches<-parLapply(Cluster,IndividualDocumentsList,validSentences,Words)
+DocumentSentenceGenusMatches<-parLapply(Cluster,IndividualDocumentsList,validSentences,Words)
 Start-Sys.time()
-#Eliminate the documents without any word matches from DocumentSentenceNamesMatches
-FilteredDocumentSentenceMatches<-sapply(DocumentSentenceNamesMatches,length)
-ActualNamesSentenceMatches<-DocumentSentenceNamesMatches[which(FilteredDocumentSentenceMatches!=0)]
+#Eliminate the documents without any word matches from DocumentSentenceGenusMatches
+FilteredDocumentSentenceMatches<-sapply(DocumentSentenceGenusMatches,length)
+ActualGenussSentenceMatches<-DocumentSentenceGenusMatches[which(FilteredDocumentSentenceMatches!=0)]
 #WHICH FUNCTION SPITS OUT ELEMENT NUMBERS THAT ARE TRUE!
 
 
@@ -101,15 +101,48 @@ Words<-c("pyrite","pyritized","pyritization","pyrititic","glauconite","glaucanit
 Words<-c(Words,gsub("(^[[:alpha:]])", "\\U\\1", Words, perl=TRUE))
 #Run functions to search for instances of words of interest in all documents.
 #Find sentences that contain the words of interest for all documents
-DocumentSentenceFossilizationMatches<-parLapply(Cluster,IndividualDocumentsList,validSentences,Words)
-#Get rid of blank elements in DocumentSentenceFossilizationMatches
-FilteredFossilizationSentenceMatches<-sapply(DocumentSentenceFossilizationMatches,length)
-ActualFossilizationSentenceMatches<-DocumentSentenceFossilizationMatches[which(FilteredFossilizationSentenceMatches!=0)]
+DocumentSentencePyriteMatches<-parLapply(Cluster,IndividualDocumentsList,validSentences,Words)
+#Get rid of blank elements in DocumentSentencePyriteMatches
+FilteredPyriteSentenceMatches<-sapply(DocumentSentencePyriteMatches,length)
+ActualPyriteSentenceMatches<-DocumentSentencePyriteMatches[which(FilteredPyriteSentenceMatches!=0)]
 
 ########################## Determine which articles contain fossil and name words############################
-DocumentMatches<-intersect(names(ActualNamesSentenceMatches),names(ActualFossilizationSentenceMatches))
-IntersectNamesSentenceMatches<-ActualNamesSentenceMatches[DocumentMatches]
-IntersectFossilizationSentenceMatches<-ActualFossilizationSentenceMatches[DocumentMatches]
+DocumentMatches<-intersect(names(ActualGenusSentenceMatches),names(ActualPyriteSentenceMatches))
+IntersectGenusSentenceMatches<-ActualGenusSentenceMatches[DocumentMatches]
+IntersectPyriteSentenceMatches<-ActualPyriteSentenceMatches[DocumentMatches]
+
+
+
+
+# Find Number of Documents in IntersectPyriteSentenceMatches list
+length(IntersectPyriteSentenceMatches) #494
+#Create a vector the number of documents
+NumPyriteDocsVector<-1:length(IntersectPyriteSentenceMatches)
+# Create NewList that will only have columns of IntersectPyriteSentencematches list
+NewPyriteList<-vector("list",length=494)
+# Use a for loop to create the NewList of columns for each document
+for(DocumentElement in NumPyriteDocsVector){
+    NewPyriteList[[DocumentElement]]<-IntersectPyriteSentenceMatches[[DocumentElement]][,2]
+    }
+
+#Repeat this process for IntersectGenusSentenceMatches list (create new list of only columns)
+length(IntersectGenusSentenceMatches) # 494
+NumGenusDocsVector<-1:length(IntersectGenusSentenceMatches)
+NewGenusList<-vector("list",length=494)
+for (DocumentElement in NumGenusDocsVector){
+    NewGenusList[[DocumentElement]]<-IntersectGenusSentenceMatches[[DocumentElement]][,2]
+    }
+
+# See which sentences in all documents have both genus and pyrite words
+NumDocsVector<-1:494
+ComparisonList<-vector("list",length=494)
+names(ComparisonList)<-names(IntersectGenusSentenceMatches)
+for (DocumentElement in NumDocsVector){
+    ComparisonList[[DocumentElement]]<-which(NewGenusList[[DocumentElement]] %in% NewPyriteList[[DocumentElement]])
+    }
+    
+ ComparisonList[which(sapply(ComparisonList,length)>0)]
+###############
 
 ######################################### Bad Genus Names ###################################################
 Here
@@ -151,3 +184,7 @@ WordSearchResuls<-sapply(FirstDocument[,"words"],wordSearch,Words)
 which(WordSearchResuls,arr.ind=TRUE)
 #Show words that appear in document
 Words[which(WordSearchResuls,arr.ind=TRUE)[,1]]
+
+NumPyriteDocsVector<-1:length(IntersectPyriteSentenceMatches)
+PyriteArray<-array(data=NA,dim=494)
+for(DocumentElement in NumFossilDocsVector){PyriteArray[DocumentElement]<-dim(IntersectPyriteSentenceMatches[[DocumentElement]])[1]}
