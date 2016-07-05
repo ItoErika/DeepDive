@@ -25,6 +25,12 @@ Connection <- dbConnect(Driver, dbname = "erikaito", host = "localhost", port = 
 # Load Data Table Into R 
 DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM pyrite_example_data")
 
+###################################### Load Pre-processed Documents ########################################
+#Load matches of genus names and documents
+ActualNamesSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Names_Sentence_Matches")
+#Load matches of pyritization words and documents
+ActualFossilizationSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Fossilization_Sentence_Matches")
+
 ############################## Search for words in an individual document ##################################
 
 IndividualDocumentsList<-split(DeepDiveData,DeepDiveData[,"docid"])
