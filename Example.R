@@ -27,10 +27,9 @@ DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM pyrite_example_data")
 
 ###################################### Load Pre-processed Documents ########################################
 #Load matches of genus names and documents
-ActualGenusSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Genus_Sentence_Matches")
+ActualGenusSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Names_Sentence_Matches")
 #Load matches of pyritization words and documents
-ActualPyriteSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Pyrite_Sentence_Matches")
-
+ActualPyriteSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Fossilization_Sentence_Matches")
 ############################## Search for words in an individual document ##################################
 
 IndividualDocumentsList<-split(DeepDiveData,DeepDiveData[,"docid"])
@@ -91,7 +90,7 @@ DocumentSentenceGenusMatches<-parLapply(Cluster,IndividualDocumentsList,validSen
 Start-Sys.time()
 #Eliminate the documents without any word matches from DocumentSentenceGenusMatches
 FilteredDocumentSentenceMatches<-sapply(DocumentSentenceGenusMatches,length)
-ActualGenussSentenceMatches<-DocumentSentenceGenusMatches[which(FilteredDocumentSentenceMatches!=0)]
+ActualGenusSentenceMatches<-DocumentSentenceGenusMatches[which(FilteredDocumentSentenceMatches!=0)]
 #WHICH FUNCTION SPITS OUT ELEMENT NUMBERS THAT ARE TRUE!
 
 
@@ -119,8 +118,9 @@ length(IntersectPyriteSentenceMatches) #494
 #Create a vector the number of documents
 NumPyriteDocsVector<-1:length(IntersectPyriteSentenceMatches)
 # Create NewList that will only have columns of IntersectPyriteSentencematches list
-NewPyriteList<-vector("list",length=length(IntersectPyriteMatches)
-# Use a for loop to create the NewList of columns for each document
+NewPyriteList<-vector("list",length=length(IntersectPyriteSentenceMatches))
+names(NewPyriteList)<-names(IntersectPyriteSentenceMatches)
+# Use a for loop to create the NewList of columns (sentence ID numbers) for each document
 for(DocumentElement in NumPyriteDocsVector){
     NewPyriteList[[DocumentElement]]<-IntersectPyriteSentenceMatches[[DocumentElement]][,2]
     }
@@ -128,7 +128,8 @@ for(DocumentElement in NumPyriteDocsVector){
 #Repeat this process for IntersectGenusSentenceMatches list (create new list of only columns)
 length(IntersectGenusSentenceMatches) # 494
 NumGenusDocsVector<-1:length(IntersectGenusSentenceMatches)
-NewGenusList<-vector("list",length=length(IntersectGenusSentenceMatches)
+NewGenusList<-vector("list",length=length(IntersectGenusSentenceMatches))
+names(NewGenusList)<-names(IntersectGenusSentenceMatches)
 for (DocumentElement in NumGenusDocsVector){
     NewGenusList[[DocumentElement]]<-IntersectGenusSentenceMatches[[DocumentElement]][,2]
     }
@@ -136,19 +137,50 @@ for (DocumentElement in NumGenusDocsVector){
 # See which sentences in all documents have both genus and pyrite words
 #In lines the following two lines you can use length(IntersectGenusSentenceMatches) OR length(IntersectPyriteSentenceMatches because they contain the same number of documents
 NumDocsVector<-1:length(IntersectGenusSentenceMatches)
-ComparisonList<-vector("list",length=length(IntersectGenusSentenceMatches)
+ComparisonList<-vector("list",length=length(IntersectGenusSentenceMatches))
 names(ComparisonList)<-names(IntersectGenusSentenceMatches)
 for (DocumentElement in NumDocsVector){
-    ComparisonList[[DocumentElement]]<-which(NewGenusList[[DocumentElement]] %in% NewPyriteList[[DocumentElement]])
+    ComparisonList[[DocumentElement]]<-NewGenusList[[DocumentElement]][which(NewGenusList[[DocumentElement]] %in% NewPyriteList[[DocumentElement]])]
     }
 
 #Create a list that contains all documents with sentence numbers that contain both genus and pyrite words
- GenusandPyriteList<-ComparisonList[which(sapply(ComparisonList,length)>0)]
+GenusandPyriteList<-ComparisonList[which(sapply(ComparisonList,length)>0)]
  
-################## Get DeepDiveData rows for each of the documents from ComparisonList######################
+################### Get DeepDiveData rows that contain Pyrite and Genus Words #####################
 
 # Get ComparisonList Document IDs
-GenusandPyriteDocuments<-names(GenusandPyriteList)
+GenusandPyriteDocumentIDs<-names(GenusandPyriteList)
+
+#Get DeepDiveData sentences for the GenusandPyriteList documents
+#Get DeepDiveData data for the GenusandPyriteList documents
+IndividualDocumentsList<-split(DeepDiveData,DeepDiveData[,"docid"])
+NumGenusandPyriteDocsVector<-1:length(GenusandPyriteList)
+GenusandPyriteSentencesList<-vector("list",length=length(GenusandPyriteList))
+names(GenusandPyriteSentencesList)<-names(GenusandPyriteList)
+for(DocID in NumGenusandPyriteDocsVector){
+    GenusandPyriteSentencesList[[DocID]]<-(IndividualDocumentsList[[DocID]][GenusandPyriteList[[DocID]],]
+    }
+    
+NamesVector<-names(GenusandPyriteSentencesList)
+    
+FinalMatchesMatrix<-do.call(rbind,GenusandPyriteSentencesList)
+    
+# Find the number of sentences of which contain both pyrite and genus words
+NumSentencesVector<-1:length(GenusandPyriteList)
+SentencesArray<-array(data=NA,dim=length(GenusandPyriteList))
+for(DocumentElement in NumSentencesVector) {SentencesArray[DocumentElement]<-length(GenusandPyriteList[[DocumentElement]])}
+
+
+
+
+# Use a for loop to extract actual sentences rows from DeepDiveData
+NumberofSentencesVector<-1:sum(SentencesArray)
+MatchSentencesList<-vector("list",length=sum(SentencesArray))
+names(MatchSentencesList)<-names(GenusandPyriteSentencesList)
+for(Sentence in Document){MatchSentencesList[Sentence]<-
+
+
+IndividualDocumentsList[['54b43244e138239d868492ff']][1:20,"words"]
 
 ######################################### Bad Genus Names ###################################################
 Here
@@ -192,8 +224,8 @@ which(WordSearchResuls,arr.ind=TRUE)
 Words[which(WordSearchResuls,arr.ind=TRUE)[,1]]
 
 #Loading in saved R data example
-> ActualGenusSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Names_Sentence_Matches")
-> ActualPyriteSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Fossilization_Sentence_Matches")
+ActualGenusSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Names_Sentence_Matches")
+ActualPyriteSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Fossilization_Sentence_Matches")
 
 NumPyriteDocsVector<-1:length(IntersectPyriteSentenceMatches)
 PyriteArray<-array(data=NA,dim=494)
