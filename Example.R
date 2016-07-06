@@ -41,11 +41,11 @@ Words<-c("pyrite","glauconite","chert","apatite")
 
 #Function time
 wordSearch<-function(Sentence,Words) {
-  CleanedSentences<-gsub("\\{|\\}|\\.|\\(|\\)|\\—","",Sentence)
-  SplitSentences<-strsplit(CleanedSentences,",")
-  FoundWords<-Words%in%unlist(SplitSentences)
-  return(FoundWords)
-  }
+  	CleanedSentences<-gsub("\\{|\\}|\\.|\\(|\\)|\\—","",Sentence)
+  	SplitSentences<-strsplit(CleanedSentences,",")
+  	FoundWords<-Words%in%unlist(SplitSentences)
+  	return(FoundWords)
+  	}
   
 # Apply the wordSearch function to all sentences in FirstDocument 
 WordSearchResuls<-sapply(FirstDocument[,"words"],wordSearch,Words)
