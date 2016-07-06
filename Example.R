@@ -3,18 +3,18 @@
 # []-notation is used wherever possible, and $-notation is avoided.
 
 
-################################# Load Required Libraries and Download Data #################################
+######################################## Load Required Libraries ###########################################
 
 # Load Required Libraries
 library("RPostgreSQL")
 library("doParallel")
 #Designate PBDB as source
 source("https://raw.githubusercontent.com/aazaff/paleobiologyDatabase.R/master/communityMatrix.R")
+
+########################################### Download Data ##################################################
+
 #Download list of taxonomic names from PBDB
 DataPBDB<-downloadPBDB(Taxa=c("Bivalvia","Brachiopoda"),StartInterval="Cambrian",StopInterval="Holocene")
-
-# Make Core Cluster
-Cluster<-makeCluster(6)
 
 ##################################### Establish postgresql connection #######################################
 
@@ -80,6 +80,8 @@ validSentences<-function(Document,Words) {
     return(PresentWords)
     }
 
+# Make Core Cluster
+Cluster<-makeCluster(6)
 # Pass the functions to the cluster
 clusterExport(cl=Cluster,varlist=c("wordSearch","validSentences"))
 
