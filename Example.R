@@ -114,14 +114,12 @@ IntersectGenusSentenceMatches<-ActualGenusSentenceMatches[DocumentMatches]
 IntersectPyriteSentenceMatches<-ActualPyriteSentenceMatches[DocumentMatches]
 
 
-
-
 # Find Number of Documents in IntersectPyriteSentenceMatches list
 length(IntersectPyriteSentenceMatches) #494
 #Create a vector the number of documents
 NumPyriteDocsVector<-1:length(IntersectPyriteSentenceMatches)
 # Create NewList that will only have columns of IntersectPyriteSentencematches list
-NewPyriteList<-vector("list",length=494)
+NewPyriteList<-vector("list",length=length(IntersectPyriteMatches)
 # Use a for loop to create the NewList of columns for each document
 for(DocumentElement in NumPyriteDocsVector){
     NewPyriteList[[DocumentElement]]<-IntersectPyriteSentenceMatches[[DocumentElement]][,2]
@@ -130,21 +128,27 @@ for(DocumentElement in NumPyriteDocsVector){
 #Repeat this process for IntersectGenusSentenceMatches list (create new list of only columns)
 length(IntersectGenusSentenceMatches) # 494
 NumGenusDocsVector<-1:length(IntersectGenusSentenceMatches)
-NewGenusList<-vector("list",length=494)
+NewGenusList<-vector("list",length=length(IntersectGenusSentenceMatches)
 for (DocumentElement in NumGenusDocsVector){
     NewGenusList[[DocumentElement]]<-IntersectGenusSentenceMatches[[DocumentElement]][,2]
     }
 
 # See which sentences in all documents have both genus and pyrite words
-NumDocsVector<-1:494
-ComparisonList<-vector("list",length=494)
+#In lines the following two lines you can use length(IntersectGenusSentenceMatches) OR length(IntersectPyriteSentenceMatches because they contain the same number of documents
+NumDocsVector<-1:length(IntersectGenusSentenceMatches)
+ComparisonList<-vector("list",length=length(IntersectGenusSentenceMatches)
 names(ComparisonList)<-names(IntersectGenusSentenceMatches)
 for (DocumentElement in NumDocsVector){
     ComparisonList[[DocumentElement]]<-which(NewGenusList[[DocumentElement]] %in% NewPyriteList[[DocumentElement]])
     }
-    
- ComparisonList[which(sapply(ComparisonList,length)>0)]
-###############
+
+#Create a list that contains all documents with sentence numbers that contain both genus and pyrite words
+ GenusandPyriteList<-ComparisonList[which(sapply(ComparisonList,length)>0)]
+ 
+################## Get DeepDiveData rows for each of the documents from ComparisonList######################
+
+# Get ComparisonList Document IDs
+GenusandPyriteDocuments<-names(GenusandPyriteList)
 
 ######################################### Bad Genus Names ###################################################
 Here
@@ -186,6 +190,10 @@ WordSearchResuls<-sapply(FirstDocument[,"words"],wordSearch,Words)
 which(WordSearchResuls,arr.ind=TRUE)
 #Show words that appear in document
 Words[which(WordSearchResuls,arr.ind=TRUE)[,1]]
+
+#Loading in saved R data example
+> ActualGenusSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Names_Sentence_Matches")
+> ActualPyriteSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Fossilization_Sentence_Matches")
 
 NumPyriteDocsVector<-1:length(IntersectPyriteSentenceMatches)
 PyriteArray<-array(data=NA,dim=494)
