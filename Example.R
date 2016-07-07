@@ -51,7 +51,7 @@ WordSearchResults<-sapply(FirstDocument[,"words"],wordSearch,Words)
 #Get sentences where words appear
 which(WordSearchResults,arr.ind=TRUE) #row number corresponds to Words and column number corresponds to sentences. 
 
-############################### Search for genus names in all Documents ###################################
+############################### Search for genus names in all Documents #####################################
 # Split the postgres table into individual documents
 IndividualDocumentsList<-split(DeepDiveData,DeepDiveData[,"docid"])
 
@@ -146,7 +146,7 @@ for (DocumentElement in NumDocsVector){
 #Create a list that contains all documents with sentence IDs that contain both genus and pyrite words
 GenusPyriteList<-ComparisonList[which(sapply(ComparisonList,length)>0)]
  
-################### Get DeepDiveData rows that contain Pyrite and Genus Words #####################
+######################## Get DeepDiveData rows that contain Pyrite and Genus Words ##########################
 
 # Get ComparisonList Document IDs
 GenusPyriteDocumentIDs<-names(GenusPyriteList)
@@ -162,7 +162,7 @@ for(DocID in NumGenusPyriteDocsVector){
 
 FinalMatchesMatrix<-do.call(rbind,GenusPyriteSentencesList)
 
-#####################################
+##################################### Find the parent words of pyrite words #################################
 
 #Select words of interest
 PyriteDictionary<-c("pyrite","pyritized","pyritization","pyrititic","glauconite","glauconitic","chert","carbonized","carbonaceous","apatite","silicification","siliceous","silicified","phosphatization","phosphatic","phosphatized","phosphate","hematite","calcified","hematitic")
