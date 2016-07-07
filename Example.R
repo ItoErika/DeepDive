@@ -159,25 +159,24 @@ names(GenusPyriteSentencesList)<-names(GenusPyriteList)
 for(DocID in NumGenusPyriteDocsVector){
     GenusPyriteSentencesList[[names(GenusPyriteList)[DocID]]]<-IndividualDocumentsList[[names(GenusPyriteList)[DocID]]][GenusPyriteList[[names(GenusPyriteList)[DocID]]],]
     }
-    
+
 FinalMatchesMatrix<-do.call(rbind,GenusPyriteSentencesList)
-    
-# Find the number of sentences of which contain both pyrite and genus words
-NumSentencesVector<-1:length(GenusPyriteList)
-SentencesArray<-array(data=NA,dim=length(GenusPyriteList))
-for(DocumentElement in NumSentencesVector) {SentencesArray[DocumentElement]<-length(GenusPyriteList[[DocumentElement]])}
+
+#####################################
+
+Sentence<-DeepDiveData[2446,"words"]
+WordVector<-strsplit(Sentence,",")
+WordVector<-unlist(WordVector)
+ParentsVector<-DeepDiveData[2446,"dep_parents"]
+ParentVector<-unlist(ParentsVector)
+WordVector[8]==WordVector[as.numeric(ParentVector[10])] | [10]==WordVector[as.numeric(ParentVector[8])]
 
 
 
 
-# Use a for loop to extract actual sentences rows from DeepDiveData
-NumberofSentencesVector<-1:sum(SentencesArray)
-MatchSentencesList<-vector("list",length=sum(SentencesArray))
-names(MatchSentencesList)<-names(GenusPyriteSentencesList)
-for(Sentence in Document){MatchSentencesList[Sentence]<-
-
-
-IndividualDocumentsList[['54b43244e138239d868492ff']][1:20,"words"]
+> parentFinder<-function(PyriteWord,GenusWord)
++ {SplitSentences<-strsplit(Sentence,",")
++ Parents<-PyriteWord parent of GenusWord | GenusWord parent of Pyrite Word
 
 ######################################### Bad Genus Names ###################################################
 Here
