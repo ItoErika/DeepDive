@@ -47,9 +47,9 @@ wordSearch<-function(Sentence,Words) {
   	}
   
 # Apply the wordSearch function to all sentences in FirstDocument 
-WordSearchResuls<-sapply(FirstDocument[,"words"],wordSearch,Words)
+WordSearchResults<-sapply(FirstDocument[,"words"],wordSearch,Words)
 #Get sentences where words appear
-which(WordSearchResuls,arr.ind=TRUE) #row number corresponds to Words and column number corresponds to sentences. 
+which(WordSearchResults,arr.ind=TRUE) #row number corresponds to Words and column number corresponds to sentences. 
 
 ############################### Search for genus names in all Documents ###################################
 # Split the postgres table into individual documents
@@ -164,20 +164,28 @@ FinalMatchesMatrix<-do.call(rbind,GenusPyriteSentencesList)
 
 #####################################
 
-Sentence<-DeepDiveData[2446,"words"]
-WordVector<-strsplit(Sentence,",")
-WordVector<-unlist(WordVector)
-ParentsVector<-DeepDiveData[2446,"dep_parents"]
-ParentVector<-unlist(ParentsVector)
-WordVector[8]==WordVector[as.numeric(ParentVector[10])] | [10]==WordVector[as.numeric(ParentVector[8])]
+#Select words of interest
+PyriteDictionary<-c("pyrite","pyritized","pyritization","pyrititic","glauconite","glauconitic","chert","carbonized","carbonaceous","apatite","silicification","siliceous","silicified","phosphatization","phosphatic","phosphatized","phosphate","hematite","calcified","hematitic")
+#make vector of upper case words
+PyriteDictionary<-c(PyriteDictionary,gsub("(^[[:alpha:]])", "\\U\\1", PyriteDictionary, perl=TRUE))
+GenusDictionary<-unique(GenusPBDB[,"genus"])
 
+# Function for identifying the parent of matches
+findParents<-function(DocRow,FirstDictionary=PyriteDictionary) {
+    CleanedWords<-gsub("\\{|\\}","",DocRow["words"])
+    CleanedParents<-gsub("\\{|\\}","",DocRow["dep_parents"])
+    SplitParents<-unlist(strsplit(CleanedParents,","))
+  	SplitWords<-unlist(strsplit(CleanedWords,","))
+  	FoundWords<-SplitWords%in%FirstDictionary
+  	return(SplitWords[as.numeric(SplitParents[which(FoundWords)])])
+  	}
 
-
-
-> parentFinder<-function(PyriteWord,GenusWord)
-+ {SplitSentences<-strsplit(Sentence,",")
-+ Parents<-PyriteWord parent of GenusWord | GenusWord parent of Pyrite Word
-
+parentFinder<-function(
+    PyriteWord,GenusWord){
+    SplitSentences<-strsplit(Sentence,",")
+    Parents<-PyriteWord parent of GenusWord | GenusWord parent of Pyrite Word
+    }
+    
 ######################################### Bad Genus Names ###################################################
 Here
 
@@ -214,10 +222,10 @@ Search%in%Test[[1]]
 
 
 # Apply the wordSearch function to all sentences in FirstDocument 
-WordSearchResuls<-sapply(FirstDocument[,"words"],wordSearch,Words)
-which(WordSearchResuls,arr.ind=TRUE)
+WordSearchResults<-sapply(FirstDocument[,"words"],wordSearch,Words)
+which(WordSearchResults,arr.ind=TRUE)
 #Show words that appear in document
-Words[which(WordSearchResuls,arr.ind=TRUE)[,1]]
+Words[which(WordSearchResults,arr.ind=TRUE)[,1]]
 
 #Loading in saved R data example
 ActualGenusSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_Names_Sentence_Matches")
@@ -226,3 +234,11 @@ ActualPyriteSentenceMatches<-readRDS("~/Documents/Erika_DeepDive/R Stuff/Actual_
 NumPyriteDocsVector<-1:length(IntersectPyriteSentenceMatches)
 PyriteArray<-array(data=NA,dim=494)
 for(DocumentElement in NumFossilDocsVector){PyriteArray[DocumentElement]<-dim(IntersectPyriteSentenceMatches[[DocumentElement]])[1]}
+
+#dep_parents code example
+Sentence<-DeepDiveData[2446,"words"]
+WordVector<-strsplit(Sentence,",")
+WordVector<-unlist(WordVector)
+ParentsVector<-DeepDiveData[2446,"dep_parents"]
+ParentVector<-unlist(ParentsVector)
+WordVector[8]==WordVector[as.numeric(ParentVector[10])] | [10]==WordVector[as.numeric(ParentVector[8])]
