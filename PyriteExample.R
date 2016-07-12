@@ -148,9 +148,6 @@ GenusPyriteList<-ComparisonList[which(sapply(ComparisonList,length)>0)]
  
 ######################## Get DeepDiveData rows that contain Pyrite and Genus Words ##########################
 
-# Get ComparisonList Document IDs
-GenusPyriteDocumentIDs<-names(GenusPyriteList)
-
 #Get DeepDiveData rows for the GenusPyriteList sentences
 IndividualDocumentsList<-split(DeepDiveData,DeepDiveData[,"docid"])
 NumGenusPyriteDocsVector<-1:length(GenusPyriteList)
@@ -180,8 +177,7 @@ findParents<-function(DocRow,FirstDictionary=PyriteDictionary) {
   	return(SplitWords[as.numeric(SplitParents[which(FoundWords)])])
   	}
 
-parentFinder<-function(
-    PyriteWord,GenusWord){
+parentFinder<-function(PyriteWord,GenusWord) {
     SplitSentences<-strsplit(Sentence,",")
     Parents<-PyriteWord parent of GenusWord | GenusWord parent of Pyrite Word
     }
