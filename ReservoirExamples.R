@@ -46,8 +46,38 @@ findParents<-function(DocRow,FirstDictionary=ReservoirDictionary) {
     SplitParents<-unlist(strsplit(CleanedParents,","))
   	SplitWords<-unlist(strsplit(CleanedWords,","))
   	FoundWords<-SplitWords%in%FirstDictionary
-  	return(SplitWords[as.numeric(SplitParents[which(FoundWords)])])
+  	
+  	# Create coumns for final matrix
+  	MatchedWords<-SplitWords[which(FoundWords)]
+  	FoundParents<-SplitWords[as.numeric(SplitParents[which(FoundWords)])]
+  	DocumentID<-rep(DocRow["docid"],length(MatchedWords))
+  	SentenceID<-rep(DocRow["sentid"],length(MatchedWords))
+  	
+  	
+  	# Account for the stupidity of the dep_parents field
+  	if (length(FoundParents)<1) {
+  	    FoundParents<-rep(NA,length(MatchedWords))
+  	    }
+  	
+  	# Return the function output
+  	return(cbind(MatchedWords,FoundParents,DocumentID,SentenceID))
   	}
+  	
+DDResults<-pbapply(DeepDiveData[1:1000,],1,findParents,PyriteDictionary)
+ParentMatches<-sapply(DDResults,length)
+# Rbind the matrix together
+DDResultsMatrix<-do.call(rbind,DDResults)
+
+#F################## Find sentences with words from both dictionaries in DeepDiveData ########################
+
+#Use a for loop to extract desired sentences from DeepDiveData
+#Remember to store sentences as a data frame because there is both numeric and text data
+DDSentences<-data.frame(matrix(NA,nrow=nrow(DDResultsMatrix),ncol=ncol(DeepDiveData)))
+for (Row in 1:nrow(DDResultsMatrix)) {
+    DDSentences[Row,]<-subset(DeepDiveData,DeepDiveData[,"docid"]==DDResultsMatrix[Row,"DocumentID"] & DeepDiveData[,"sentid"]==as.numeric(DDResultsMatrix[Row,"SentenceID"]))
+    }
+
+
 
 
 ################################################# DeepDive Analyses ##########################################
@@ -55,7 +85,29 @@ findParents<-function(DocRow,FirstDictionary=ReservoirDictionary) {
 ReservoirSentences<-pbapply(DeepDiveData,1,findParents)
 
 # Extract only matching sentences
-ReservoirMatches<-sapply(ReservoirSentences,length)
+ReservoirMatches<-sapply(ReservoirSentences,nrow)
 ReservoirSentences<-ReservoirSentneces[which(ReservoirMatches!=0)]
+
+
+
+############################################ Step by step examples ############################################
+
+# Get the IDs of unique documents
+Documents<-unique(DDResultsMatrix[,"DocumentID"])
+
+# Get document data of DDResultsMatrix from DeepDiveData
+Documents<-subset(DeepDiveData,DeepDiveData[,"docid"]%in%unique(DDResultsMatrix[,"DocumentID"]))
+
+# Subset DeepDiveData to get a sentence of interest 
+subset(DeepDiveData,DeepDiveData[,"docid"]==DDResultsMatrix[1,"DocumentID"] & DeepDiveData[,"sentid"]==as.numeric(DDResultsMatrix[1,"SentenceID"]))
+
+
+
+
+
+    
+
+
+
 
 
