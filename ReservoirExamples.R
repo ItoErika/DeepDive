@@ -39,6 +39,7 @@ UnitsFrame<-read.csv(text=GotURL,header=TRUE)
 UnitsDictionary<-unique(UnitsFrame[,"unit_name"])
 
 ######################################## Establish DeepDive Functions #######################################
+
 # Function for identifying the parent of matches
 findParents<-function(DocRow,FirstDictionary=ReservoirDictionary) {
     CleanedWords<-gsub("\\{|\\}","",DocRow["words"])
@@ -53,12 +54,11 @@ findParents<-function(DocRow,FirstDictionary=ReservoirDictionary) {
   	DocumentID<-rep(DocRow["docid"],length(MatchedWords))
   	SentenceID<-rep(DocRow["sentid"],length(MatchedWords))
   	
-  	
-  	# Account for the stupidity of the dep_parents field
+  	# Account for words with missing parents 
   	if (length(FoundParents)<1) {
   	    FoundParents<-rep(NA,length(MatchedWords))
   	    }
-  	
+  	    
   	# Return the function output
   	return(cbind(MatchedWords,FoundParents,DocumentID,SentenceID))
   	}
@@ -77,16 +77,16 @@ for (Row in 1:nrow(DDResultsMatrix)) {
     DDSentences[Row,]<-subset(DeepDiveData,DeepDiveData[,"docid"]==DDResultsMatrix[Row,"DocumentID"] & DeepDiveData[,"sentid"]==as.numeric(DDResultsMatrix[Row,"SentenceID"]))
     }
 
-
-
-
 ################################################# DeepDive Analyses ##########################################
+
 # Find all sentences with matches in initial dictionary (i.e., Reservoir Dictionary)
 ReservoirSentences<-pbapply(DeepDiveData,1,findParents)
 
 # Extract only matching sentences
 ReservoirMatches<-sapply(ReservoirSentences,nrow)
-ReservoirSentences<-ReservoirSentneces[which(ReservoirMatches!=0)]
+ReservoirSentences<-ReservoirSentences[which(ReservoirMatches!=0)]
+
+
 
 
 
