@@ -1,0 +1,54 @@
+# In Postico
+CREATE TABLE reservoir_data
+(docid text, sentid integer, wordid integer[], words text[], poses text[], ners text[], lemmas text[], dep_paths text[], dep_parents integer []);
+COPY reservoir_data FROM '/Users/erikaito/Documents/Erika_DeepDive/sentences_nlp352' WITH delimiter as '	';
+
+# In R
+# Load Libraries
+library("RPostgreSQL")
+library("doParallel")
+library(pbapply)
+#install and load RCurl package to use getURL function
+install.packages("RCurl")
+library(RCurl)
+
+# Connect to postgresql
+Driver <- dbDriver("PostgreSQL") # Establish database driver
+Connection <- dbConnect(Driver, dbname = "erikaito", host = "localhost", port = 5432, user = "erikaito")
+DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM reservoir_data")
+
+#Select words of interest
+ReservoirDictionary<-c("aquifer","reservoir","aquitard","aquiclude","water","oil","gas","coal","aquifuge")
+# Make vector of upper case words and add it to the original vector
+ReservoirDictionary<-c(ReservoirDictionary,gsub("(^[[:alpha:]])", "\\U\\1", ReservoirDictionary, perl=TRUE))
+
+# Download dictionary of unit names from Macrostrat Database
+UnitsURL<-paste("https://dev.macrostrat.org/api/units?project_id=1&format=csv")
+GotURL<-getURL(UnitsURL)
+UnitsFrame<-read.csv(text=GotURL,header=TRUE)
+
+
+# write function to find parents of reservoir words in DeepDive documents
+findParents<-function(DocRow,FirstDictionary=ReservoirDictionary) {
+    CleanedWords<-gsub("\\{|\\}","",DocRow["words"])
+    CleanedParents<-gsub("\\{|\\}","",DocRow["dep_parents"])
+    SplitParents<-unlist(strsplit(CleanedParents,","))
+  	SplitWords<-unlist(strsplit(CleanedWords,","))
+  	FoundWords<-SplitWords%in%FirstDictionary
+  	
+  	# Create coumns for final matrix
+  	MatchedWords<-SplitWords[which(FoundWords)]
+  	FoundParents<-SplitWords[as.numeric(SplitParents[which(FoundWords)])]
+  	DocumentID<-rep(DocRow["docid"],length(MatchedWords))
+  	SentenceID<-rep(DocRow["sentid"],length(MatchedWords))
+  	
+  	# Account for words with missing parents 
+  	if (length(FoundParents)<1) {
+  	    FoundParents<-rep(NA,length(MatchedWords))
+  	    }
+  	    
+  	# Return the function output
+  	return(cbind(MatchedWords,FoundParents,DocumentID,SentenceID))
+  	}
+  	
+DDResults<-pbapply(DeepDiveData,1,findParents,ReservoirDictionary)
