@@ -33,19 +33,19 @@ findParents<-function(DocRow,FirstDictionary=ReservoirDictionary) {
     CleanedWords<-gsub("\\{|\\}","",DocRow["words"])
     CleanedParents<-gsub("\\{|\\}","",DocRow["dep_parents"])
     SplitParents<-unlist(strsplit(CleanedParents,","))
-  	SplitWords<-unlist(strsplit(CleanedWords,","))
-  	FoundWords<-SplitWords%in%FirstDictionary
+    SplitWords<-unlist(strsplit(CleanedWords,","))
+    FoundWords<-SplitWords%in%FirstDictionary
   	
   	# Create columns for final matrix
-  	MatchedWords<-SplitWords[which(FoundWords)]
-  	FoundParents<-SplitWords[as.numeric(SplitParents[which(FoundWords)])]
-  	DocumentID<-rep(DocRow["docid"],length(MatchedWords))
-  	SentenceID<-rep(DocRow["sentid"],length(MatchedWords))
+    MatchedWords<-SplitWords[which(FoundWords)]
+    FoundParents<-SplitWords[as.numeric(SplitParents[which(FoundWords)])]
+    DocumentID<-rep(DocRow["docid"],length(MatchedWords))
+    SentenceID<-rep(DocRow["sentid"],length(MatchedWords))
   	
   	# Account for words with missing parents 
   	if (length(FoundParents)<1) {
-  	    FoundParents<-rep(NA,length(MatchedWords))
-  	    }
+        FoundParents<-rep(NA,length(MatchedWords))
+        }
   	    
   	# Return the function output
   	return(cbind(MatchedWords,FoundParents,DocumentID,SentenceID))
