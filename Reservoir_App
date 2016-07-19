@@ -31,6 +31,7 @@ UnitsFrame<-read.csv(text=GotURL,header=TRUE)
 # write function to find parents of reservoir words in DeepDive documents
 findParents<-function(DocRow,FirstDictionary=ReservoirDictionary) {
     CleanedWords<-gsub("\\{|\\}","",DocRow["words"])
+    CleanedWords<-gsub("\",\"","COMMASUB",CleanedWords)
     CleanedParents<-gsub("\\{|\\}","",DocRow["dep_parents"])
     SplitParents<-unlist(strsplit(CleanedParents,","))
     SplitWords<-unlist(strsplit(CleanedWords,","))
@@ -54,3 +55,73 @@ findParents<-function(DocRow,FirstDictionary=ReservoirDictionary) {
 # Apply findParents function to DeepDiveData to get matched words data
 DDResults<-pbapply(DeepDiveData,1,findParents,ReservoirDictionary)
 DDResultsMatrix<-do.call(rbind,DDResults)
+
+##############
+
+# Create a vector of all unique unit words
+Vector<-c(as.character(UnitsFrame[,"Mbr"]),as.character(UnitsFrame[,"Fm"]),as.character(UnitsFrame[,"Gp"]),as.character(UnitsFrame[,"SGp"]))
+unique(Vector)
+VECTOR<-subset(Vector,Vector!="")
+NumUnits<-1:length(VECTOR)
+UnitDictionary<-vector("list",length=length(VECTOR))
+
+# Create dictionary list of matrices of split unit words
+for(UnitElement in NumUnits){
+    UnitDictionary[[UnitElement]]<-unlist(strsplit(noquote(gsub(" ","SPLIT",VECTOR[UnitElement])),"SPLIT"))
+    }
+
+# Pull out the first word of every matrix in the UnitDictionary list
+FirstWords<-unique(sapply(UnitDictionary,function(x) x[1]))
+
+# Find matches of FirstWords in all of the DeepDiveData documents
+# Get data for the word matches (word match, poses, documentID, adn sentenceID)
+findPoses<-function(DocRow,FirstDictionary=FirstWords) {
+  CleanedWords<-gsub("\\{|\\}","",DocRow["words"])
+    CleanedPoses<-gsub("\\{|\\}","",DocRow["poses"])
+    SplitPoses<-unlist(strsplit(CleanedPoses,","))
+    SplitWords<-unlist(strsplit(CleanedWords,","))
+  	FoundWords<-SplitWords%in%FirstDictionary
+  	
+  	# Create columns for final matrix
+  	MatchedWords<-SplitWords[which(FoundWords)]
+  	FoundPose<-SplitPoses[which(FoundWords)]
+    DocumentID<-rep(DocRow["docid"],length(MatchedWords))
+    SentenceID<-rep(DocRow["sentid"],length(MatchedWords))
+  	    
+    # Return the function output
+    return(cbind(MatchedWords,FoundPose,DocumentID,SentenceID))
+    }
+  	
+# Apply function to DeepDiveData documents
+DDResults2<-pbapply(DeepDiveData,1,findPoses,FirstWords)
+  	
+  	
+  ##########
+  
+  
+  
+  
+  
+  	
+  	DocumentID<-rep(DocRow["docid"],length(MatchedWords))
+  	SentenceID<-rep(DocRow["sentid"],length(MatchedWords))
+  	
+  	# Account for words with missing parents 
+  	if (length(FoundParents)<1) {
+  	    FoundParents<-rep(NA,length(MatchedWords))
+  	    }
+  	    
+  	# Return the function output
+  	return(cbind(MatchedWords,FoundParents,DocumentID,SentenceID))
+  	}
+
+
+###############
+Sub<-gsub(" ","SPLIT",UnitDictionary[8819])
+SplitUnitsList<-strsplit(noquote(Sub),"SPLIT")
+SplitUnits<-unlist(SplitUnitsList)
+
+SplitUnitsList<-vector("list",length=1:UnitDictionary)
+SplitUnitsList<-vector("list",length=length(UnitDictionary))
+
+unlist(strsplit(noquote(gsub(" ","SPLIT",UnitDictionary[UnitElement])),"SPLIT"))
