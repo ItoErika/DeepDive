@@ -36,7 +36,7 @@ findParents<-function(DocRow,FirstDictionary=ReservoirDictionary) {
   	SplitWords<-unlist(strsplit(CleanedWords,","))
   	FoundWords<-SplitWords%in%FirstDictionary
   	
-  	# Create coumns for final matrix
+  	# Create columns for final matrix
   	MatchedWords<-SplitWords[which(FoundWords)]
   	FoundParents<-SplitWords[as.numeric(SplitParents[which(FoundWords)])]
   	DocumentID<-rep(DocRow["docid"],length(MatchedWords))
