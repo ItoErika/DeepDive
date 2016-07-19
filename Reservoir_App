@@ -47,8 +47,8 @@ findParents<-function(DocRow,FirstDictionary=ReservoirDictionary) {
         FoundParents<-rep(NA,length(MatchedWords))
         }
   	    
-  	# Return the function output
-  	return(cbind(MatchedWords,FoundParents,DocumentID,SentenceID))
-  	}
+    # Return the function output
+    return(cbind(MatchedWords,FoundParents,DocumentID,SentenceID))
+    }
   	
 DDResults<-pbapply(DeepDiveData,1,findParents,ReservoirDictionary)
