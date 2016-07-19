@@ -36,11 +36,6 @@ findParents<-function(DocRow,FirstDictionary=ReservoirDictionary) {
     SplitWords<-unlist(strsplit(CleanedWords,","))
     FoundWords<-SplitWords%in%FirstDictionary
     
-    # Return blank matrix if there are no matches
-    if (length(which(FoundWords)<1)) {
-        return(matrix(NA,nrow=1,ncol=4,dimnames=list(1,c("MatchedWords","FoundParents","DocumentID","SentenceID"))))
-        }
-  	
     # Create columns for final matrix
     MatchedWords<-SplitWords[which(FoundWords)]
     FoundParents<-SplitWords[as.numeric(SplitParents[which(FoundWords)])]
