@@ -80,8 +80,7 @@ findPoses<-function(DocRow,FirstDictionary=FirstWords) {
     return(cbind(MatchedWords,WordPosition,FoundPose,DocumentID,SentenceID))
     }
   	
-# Apply function to DeepDiveData documents #
-
+# Apply function to DeepDiveData documents
 DDResults<-pbapply(DeepDiveData,1,findPoses,FirstWords)
 
 ##################################### Organize into Data Frame #########################################
