@@ -159,11 +159,9 @@ DDResultsMatrix<-do.call(rbind,DDResults)
 
 ##################################### Helpful Examples #############################################
 
+# splitting unit names into separate words
 Sub<-gsub(" ","SPLIT",UnitDictionary[8819])
 SplitUnitsList<-strsplit(noquote(Sub),"SPLIT")
 SplitUnits<-unlist(SplitUnitsList)
-
-SplitUnitsList<-vector("list",length=1:UnitDictionary)
 SplitUnitsList<-vector("list",length=length(UnitDictionary))
-
 unlist(strsplit(noquote(gsub(" ","SPLIT",UnitDictionary[UnitElement])),"SPLIT"))
