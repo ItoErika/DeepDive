@@ -53,6 +53,7 @@ for(UnitElement in NumUnits){
 
 # Pull out the first word of every matrix in the UnitDictionary list
 FirstWords<-unique(sapply(UnitDictionary,function(x) x[1]))
+# Minimize noise
 FirstWords<-subset(FirstWords,FirstWords!="The")
 
 ############# Find Matches of FirstWords in Deep Dive Documents and the Pose for Each Match ##############
@@ -68,14 +69,14 @@ findPoses<-function(DocRow,FirstDictionary=FirstWords) {
   	FoundWords<-SplitWords%in%FirstDictionary
   	
   	# Create columns for final matrix
-  	MatchedWords<-SplitWords[which(FoundWords)]
+  	MatchedWord<-SplitWords[which(FoundWords)]
   	WordPosition<-which(FoundWords)
-  	FoundPose<-SplitPoses[which(FoundWords)]
-    DocumentID<-rep(DocRow["docid"],length(MatchedWords))
-    SentenceID<-rep(DocRow["sentid"],length(MatchedWords))
+  	Pose<-SplitPoses[which(FoundWords)]
+    DocumentID<-rep(DocRow["docid"],length(MatchedWord))
+    SentenceID<-rep(DocRow["sentid"],length(MatchedWord))
 
     # Return the function output
-    return(cbind(MatchedWords,WordPosition,FoundPose,DocumentID,SentenceID))
+    return(cbind(MatchedWords,WordPosition,Pose,DocumentID,SentenceID))
     }
   	
 # Apply function to DeepDiveData documents
@@ -89,11 +90,11 @@ rownames(DDResultsMatrix)<-1:dim(DDResultsMatrix)[1]
 DDResultsFrame<-as.data.frame(DDResultsMatrix)
 
 # Ensure all columns are in correct format
-DDResultsFrame[,1]<-as.character(DDResultsFrame[,1])
-DDResultsFrame[,2]<-as.numeric(as.character(DDResultsFrame[,2]))
-DDResultsFrame[,3]<-as.character(DDResultsFrame[,3])
-DDResultsFrame[,4]<-as.character(DDResultsFrame[,4])
-DDResultsFrame[,5]<-as.numeric(as.character(DDResultsFrame[,5]))
+DDResultsFrame[,"MatchedWord"]<-as.character(DDResultsFrame[,"MatchedWord"])
+DDResultsFrame[,"WordPosition"]<-as.numeric(as.character(DDResultsFrame[,"WordPosition"]))
+DDResultsFrame[,"Pose"]<-as.character(DDResultsFrame[,"Pose"])
+DDResultsFrame[,"DocumentID"]<-as.character(DDResultsFrame[,"DocumentID"])
+DDResultsFrame[,"SentenceID"]<-as.numeric(as.character(DDResultsFrame[,"SentenceID"]))
 
 #################################### Isolate NNPs ############################################# 
 
@@ -103,12 +104,23 @@ DDResultsFrame<-subset(DDResultsFrame,DDResultsFrame[,3]=="NNP")
 ####################### Find NNps adjacent to DDResultsFrame Matches ##########################
 # Make function to find NNP words adjacent to the matches in DDResultsFrame
 
-findAdjacentNNPs<-function(DocRow,FirstDictionary=FirstWords) {
-  CleanedWords<-gsub("\\{|\\}","",DocRow["words"])
+findNNPs<-function(DocRow,Sentences) {
+    CleanedSentences<-gsub("\\{|\\}","",Sentence)
     CleanedPoses<-gsub("\\{|\\}","",DocRow["poses"])
     SplitPoses<-unlist(strsplit(CleanedPoses,","))
-    SplitWords<-unlist(strsplit(CleanedWords,","))
-  	FoundWords<-SplitWords%in%FirstDictionary
+    SplitSentences<-strsplit(CleanedSentences,",")
+    NNPs<-which(SplitPoses=="NNP")
+    return(NNPs)
+    }
+
+# Pair document ID and sentence ID data for DeepDiveData
+doc.sent<-paste(DeepDiveData[,"docid"],DeepDiveData[,"sentid"],sep=".")
+# Make paired document and sentence data the row names for DeepDiveData
+rownames(DeepDiveData)<-doc.sent
+# Pair document ID and sentence ID data for 
+docID.sentID<-paste(DDResultsFrame[,"DocumentID"],DDResultsFrame[,"SentenceID"],sep=".")
+# Make a new column for paired document and sentence data in DDResultsFrame
+DDResultsFrame[,"doc.sent"]=docID.sentID
   	
   	# Create columns for final matrix
   	MatchedWords<-SplitWords[which(FoundWords)]
@@ -175,3 +187,5 @@ SplitWords<-unlist(strsplit(CleanedWords,","))
 FoundWords<-SplitWords%in%FirstDictionary
 SplitWords<-unlist(strsplit(gsub("\\{|\\}","",DeepDiveData[1,"words"]),","))
 Test<-subset(DeepDiveData,DeepDiveData[,"docid"]=="54eb194ee138237cc91518dc"&DeepDiveData[,"sentid"]==796)
+
+
