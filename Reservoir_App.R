@@ -74,9 +74,10 @@ findPoses<-function(DocRow,FirstDictionary=FirstWords) {
   	Pose<-SplitPoses[which(FoundWords)]
     DocumentID<-rep(DocRow["docid"],length(MatchedWord))
     SentenceID<-rep(DocRow["sentid"],length(MatchedWord))
+    
 
     # Return the function output
-    return(cbind(MatchedWords,WordPosition,Pose,DocumentID,SentenceID))
+    return(cbind(MatchedWord,WordPosition,Pose,DocumentID,SentenceID))
     }
   	
 # Apply function to DeepDiveData documents
@@ -116,21 +117,40 @@ DDResultsFrame[,"doc.sent"]=docID.sentID
 DDMatches<-DeepDiveData[unique(DDResultsFrame[,"doc.sent"]),]
 
 # Make function to find NNP words adjacent to the matches in DDResultsFrame
-NNP<-"NNP"
-findNNPs<-function(Sentence,NNP) {
+findNNPs<-function(Sentence) {
     CleanedSentences<-gsub("\\{|\\}","",Sentence)
     CleanedPoses<-gsub("\\{|\\}","",Sentence["poses"])
     SplitPoses<-unlist(strsplit(CleanedPoses,","))
     SplitSentences<-strsplit(CleanedSentences,",")
-    NNPs<-which(SplitPoses%in%NNP)
+    NNPs<-which(SplitPoses=="NNP")
     return(NNPs)
     }
     
 # Apply findNNPs function to DDMatches
-NNPResults<-pbapply(DDMatches,1,findNNPs,NNP)
+NNPResults<-pbapply(DDMatches,1,findNNPs)
 
+##################################### Find Consecutive NNPs ######################################
 
+findConsecutive<-function(NNPPositions) {
+    Breaks<-c(0,which(diff(NNPPositions)!=1),length(NNPPositions))
+    ConsecutiveList<-lapply(seq(length(Breaks)-1),function(x) NNPPositions[(Breaks[x]+1):Breaks[x+1]])
+    return(ConsecutiveList)
+    }
 
+ConsecutiveResults<-lapply(NNPResults,findConsecutive)
+ 
+ ######################### Find Words Associated with Conescutive NNPs ###########################
+ matchWords<-function(Document){
+    DDMatches[Document,"words"]
+ 
+DDMatches["54eb194ee138237cc91518dc.1",]
+ DDMatches["54e9e7f8e138237cc91513e9.976",]
+ 
+ NNPWordResults<-pbapply(DDMatches,1,matchWords)
+ 
+ ####################################### Find Word Matches #######################
+ 
+ 
 ############################## findParents Function (Not Needed) #################################
 
 # write function to find parents of reservoir words in DeepDive documents
@@ -184,3 +204,20 @@ SplitWords<-unlist(strsplit(gsub("\\{|\\}","",DeepDiveData[1,"words"]),","))
 Test<-subset(DeepDiveData,DeepDiveData[,"docid"]=="54eb194ee138237cc91518dc"&DeepDiveData[,"sentid"]==796)
 
 
+NNP<-"NNP"
+findNNPs<-function(Sentence, NNP) {
+    CleanedSentences<-gsub("\\{|\\}","",Sentence)
+    SplitSentences<-strsplit(CleanedSentences,",")
+    CleanedPoses<-gsub("\\{|\\}","",Sentence["poses"])
+    SplitPoses<-unlist(strsplit(CleanedPoses,","))
+    CleanedWords<-gsub("\\{|\\}","",Sentence["words"])
+    SplitWords<-unlist(strsplit(CleanedWords,","))
+    FoundWords<-SplitWords%in%FirstWords
+    MatchedWord<-SplitWords[which(FoundWords)]
+    
+    NNPs<-which(SplitPoses%in%NNP)
+    DocumentID<-rep(Sentence["docid"],length(MatchedWord))
+    
+    return(cbind(NNPs,DocumentID))
+    }
+    
