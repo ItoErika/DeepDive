@@ -37,7 +37,7 @@ UnitsFrame<-read.csv(text=GotURL,header=TRUE)
 
 # Create a vector of all unique unit words
 UnitsVector<-c(as.character(UnitsFrame[,"Mbr"]),as.character(UnitsFrame[,"Fm"]),as.character(UnitsFrame[,"Gp"]),as.character(UnitsFrame[,"SGp"]))
-UnitsVector<-unique(Vector)
+UnitsVector<-unique(UnitsVector)
 Units<-subset(UnitsVector,UnitsVector!="")
 
 ######################## Split Unit Names in Units Vector into Individual Words ############################
@@ -46,7 +46,7 @@ Units<-subset(UnitsVector,UnitsVector!="")
 NumUnits<-1:length(Units)
 UnitDictionary<-vector("list",length=length(Units))
 for(UnitElement in NumUnits){
-    UnitDictionary[[UnitElement]]<-unlist(strsplit(noquote(gsub(" ","SPLIT",VECTOR[UnitElement])),"SPLIT"))
+    UnitDictionary[[UnitElement]]<-unlist(strsplit(noquote(gsub(" ","SPLIT",Units[UnitElement])),"SPLIT"))
     }
 
 ###################### Isolate First Words in Each Word String of UnitDictionary #########################
@@ -73,8 +73,6 @@ findPoses<-function(DocRow,FirstDictionary=FirstWords) {
   	FoundPose<-SplitPoses[which(FoundWords)]
     DocumentID<-rep(DocRow["docid"],length(MatchedWords))
     SentenceID<-rep(DocRow["sentid"],length(MatchedWords))
-    
-    SplitWords<-unlist(strsplit(gsub("\\{|\\}","",DeepDiveData[1,"words"]),","))
 
     # Return the function output
     return(cbind(MatchedWords,WordPosition,FoundPose,DocumentID,SentenceID))
@@ -86,7 +84,7 @@ DDResults<-pbapply(DeepDiveData,1,findPoses,FirstWords)
 ##################################### Organize into Data Frame #########################################
 
 # Create matrix of DDResults
-DDResultsMatrix2<-do.call(rbind,DDResults)
+DDResultsMatrix<-do.call(rbind,DDResults)
 rownames(DDResultsMatrix)<-1:dim(DDResultsMatrix)[1]
 DDResultsFrame<-as.data.frame(DDResultsMatrix)
 
@@ -164,3 +162,16 @@ SplitUnitsList<-strsplit(noquote(Sub),"SPLIT")
 SplitUnits<-unlist(SplitUnitsList)
 SplitUnitsList<-vector("list",length=length(UnitDictionary))
 unlist(strsplit(noquote(gsub(" ","SPLIT",UnitDictionary[UnitElement])),"SPLIT"))
+
+
+
+# Get word position of words in sentence that match FirstWords
+SplitWords<-unlist(strsplit(gsub("\\{|\\}","",DeepDiveData[1,"words"]),","))
+which(SplitWords%in%FirstWords)
+
+# Look at one sentence from DeepDiveData
+CleanedWords<-gsub("\\{|\\}","",DocRow["words"])
+SplitWords<-unlist(strsplit(CleanedWords,","))
+FoundWords<-SplitWords%in%FirstDictionary
+SplitWords<-unlist(strsplit(gsub("\\{|\\}","",DeepDiveData[1,"words"]),","))
+Test<-subset(DeepDiveData,DeepDiveData[,"docid"]=="54eb194ee138237cc91518dc"&DeepDiveData[,"sentid"]==796)
