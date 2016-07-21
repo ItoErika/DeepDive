@@ -102,16 +102,6 @@ DDResultsFrame[,"SentenceID"]<-as.numeric(as.character(DDResultsFrame[,"Sentence
 DDResultsFrame<-subset(DDResultsFrame,DDResultsFrame[,3]=="NNP")
 
 ####################### Find NNps adjacent to DDResultsFrame Matches ##########################
-# Make function to find NNP words adjacent to the matches in DDResultsFrame
-
-findNNPs<-function(DocRow,Sentences) {
-    CleanedSentences<-gsub("\\{|\\}","",Sentence)
-    CleanedPoses<-gsub("\\{|\\}","",DocRow["poses"])
-    SplitPoses<-unlist(strsplit(CleanedPoses,","))
-    SplitSentences<-strsplit(CleanedSentences,",")
-    NNPs<-which(SplitPoses=="NNP")
-    return(NNPs)
-    }
 
 # Pair document ID and sentence ID data for DeepDiveData
 doc.sent<-paste(DeepDiveData[,"docid"],DeepDiveData[,"sentid"],sep=".")
@@ -121,20 +111,25 @@ rownames(DeepDiveData)<-doc.sent
 docID.sentID<-paste(DDResultsFrame[,"DocumentID"],DDResultsFrame[,"SentenceID"],sep=".")
 # Make a new column for paired document and sentence data in DDResultsFrame
 DDResultsFrame[,"doc.sent"]=docID.sentID
-  	
-  	# Create columns for final matrix
-  	MatchedWords<-SplitWords[which(FoundWords)]
-  	WordPosition<-which(FoundWords)
-  	FoundPose<-SplitPoses[which(FoundWords)]
-    DocumentID<-rep(DocRow["docid"],length(MatchedWords))
-    SentenceID<-rep(DocRow["sentid"],length(MatchedWords))
-    
-    SplitWords<-unlist(strsplit(gsub("\\{|\\}","",DeepDiveData[1,"words"]),","))
 
-  	    
-    # Return the function output
-    return(cbind(MatchedWords,WordPosition,FoundPose,DocumentID,SentenceID))
+# Create a subset of DeepDiveData that only contains data for document sentence pairs from DDResultsFrame
+DDMatches<-DeepDiveData[unique(DDResultsFrame[,"doc.sent"]),]
+
+# Make function to find NNP words adjacent to the matches in DDResultsFrame
+NNP<-"NNP"
+findNNPs<-function(Sentence,NNP) {
+    CleanedSentences<-gsub("\\{|\\}","",Sentence)
+    CleanedPoses<-gsub("\\{|\\}","",Sentence["poses"])
+    SplitPoses<-unlist(strsplit(CleanedPoses,","))
+    SplitSentences<-strsplit(CleanedSentences,",")
+    NNPs<-which(SplitPoses%in%NNP)
+    return(NNPs)
     }
+    
+# Apply findNNPs function to DDMatches
+NNPResults<-pbapply(DDMatches,1,findNNPs,NNP)
+
+
 
 ############################## findParents Function (Not Needed) #################################
 
