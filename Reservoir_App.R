@@ -1,10 +1,12 @@
 ####################### IN POSTICO: Initial Creation of Data Table (ONLY RUN ONCE) #####################
+
 In Postico
 CREATE TABLE reservoir_data
 (docid text, sentid integer, wordid integer[], words text[], poses text[], ners text[], lemmas text[], dep_paths text[], dep_parents integer []);
 COPY reservoir_data FROM '/Users/erikaito/Documents/Erika_DeepDive/sentences_nlp352' WITH delimiter as '	';
 
 ################################ IN R: Load Required Libraries ##########################################
+
 # Load Libraries
 library("RPostgreSQL")
 library("doParallel")
