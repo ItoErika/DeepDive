@@ -147,8 +147,11 @@ ConsecutiveResults<-lapply(NNPResults,findConsecutive)
  
  ######################### Find Words Associated with Conescutive NNPs ###########################
  
+ # Note: element values for ConsecutiveResults and DDMatches correspond to the same document
+ 
  matchWords<-function(Document){
     DDMatches[Document,"words"]
+    
     DDMatches["54eb194ee138237cc91518dc.1",]
     DDMatches["54e9e7f8e138237cc91513e9.976",]
  
