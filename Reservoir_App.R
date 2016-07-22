@@ -145,17 +145,23 @@ findConsecutive<-function(NNPPositions) {
 
 ConsecutiveResults<-lapply(NNPResults,findConsecutive)
  
- ######################### Find Words Associated with Conescutive NNPs ###########################
+######################### Find Words Associated with Conescutive NNPs ###########################
  
- # Note: element values for ConsecutiveResults and DDMatches correspond to the same document
+# Note: element values for ConsecutiveResults and DDMatches correspond to the same document
  
- matchWords<-function(Document){
-    DDMatches[Document,"words"]
-    
-    DDMatches["54eb194ee138237cc91518dc.1",]
-    DDMatches["54e9e7f8e138237cc91513e9.976",]
+# Specific Example
+ConsecutiveResults[[1]][3]<-unlist(strsplit(DDMatches[1,"words"],","))[as.numeric(unlist(ConsecutiveResults[[1]][3]))]
  
- NNPWordResults<-pbapply(DDMatches,1,matchWords)
+matchWords<-function(Document){
+    NumNNPVectors<-1:length(ConsecutiveResults[[Document]])
+    NNPMatches<-vector("list",length=length(ConsecutiveResults[[Document]]))
+    for(NNPVector in NumNNPVectors){
+        NNPMatches[[Document]][NNPVector]<-unlist(strsplit(DDMatches[1,"words"],","))[as.numeric(unlist(ConsecutiveResults[[Document]][NNPVector]))]
+        }
+    return(NNPMatches)
+    }
+ 
+NNPWordResults<-lapply(ConsecutiveResults,matchWords)
  
  ####################################### Find Word Matches #######################
  
@@ -199,8 +205,6 @@ SplitUnits<-unlist(SplitUnitsList)
 SplitUnitsList<-vector("list",length=length(UnitDictionary))
 unlist(strsplit(noquote(gsub(" ","SPLIT",UnitDictionary[UnitElement])),"SPLIT"))
 
-
-
 # Get word position of words in sentence that match FirstWords
 SplitWords<-unlist(strsplit(gsub("\\{|\\}","",DeepDiveData[1,"words"]),","))
 which(SplitWords%in%FirstWords)
@@ -212,7 +216,7 @@ FoundWords<-SplitWords%in%FirstDictionary
 SplitWords<-unlist(strsplit(gsub("\\{|\\}","",DeepDiveData[1,"words"]),","))
 Test<-subset(DeepDiveData,DeepDiveData[,"docid"]=="54eb194ee138237cc91518dc"&DeepDiveData[,"sentid"]==796)
 
-
+#NNP function first draft
 NNP<-"NNP"
 findNNPs<-function(Sentence, NNP) {
     CleanedSentences<-gsub("\\{|\\}","",Sentence)
@@ -230,3 +234,6 @@ findNNPs<-function(Sentence, NNP) {
     return(cbind(NNPs,DocumentID))
     }
     
+# Double check NNPs are being numbered correctly
+DDMatches["54eb194ee138237cc91518dc.1",]
+DDMatches["54e9e7f8e138237cc91513e9.976",]
