@@ -237,3 +237,14 @@ findNNPs<-function(Sentence, NNP) {
 # Double check NNPs are being numbered correctly
 DDMatches["54eb194ee138237cc91518dc.1",]
 DDMatches["54e9e7f8e138237cc91513e9.976",]
+
+# NNP match function draft
+matchWords<-function(Document){
+    NumNNPVectors<-1:length(Document)
+     NNPMatches<-vector("list",length=length(Document))
+     for(NNPVector in NumNNPVectors){
+         NNPMatches[[Document]][NNPVector]<-unlist(strsplit(DDMatches[1,"words"],","))[as.numeric(unlist(Document[NNPVector]))]
+         }
+     return(NNPMatches)
+     }
+ NNPWordResults<-pbapply(ConsecutiveResults,1,matchWords)
