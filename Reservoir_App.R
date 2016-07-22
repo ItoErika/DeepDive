@@ -63,7 +63,9 @@ FirstWords<-subset(FirstWords,FirstWords!="The")
 
 findPoses<-function(DocRow,FirstDictionary=FirstWords) {
     CleanedWords<-gsub("\\{|\\}","",DocRow["words"])
+    CleanedWords<-gsub("\",\"","COMMASUB",CleanedWords)
     CleanedPoses<-gsub("\\{|\\}","",DocRow["poses"])
+    CleanedPoses<-gsub("\",\"","COMMASUB",CleanedPoses)
     SplitPoses<-unlist(strsplit(CleanedPoses,","))
     SplitWords<-unlist(strsplit(CleanedWords,","))
   	FoundWords<-SplitWords%in%FirstDictionary
@@ -118,8 +120,10 @@ DDMatches<-DeepDiveData[unique(DDResultsFrame[,"doc.sent"]),]
 
 # Make function to find NNP words adjacent to the matches in DDResultsFrame
 findNNPs<-function(Sentence) {
-    CleanedSentences<-gsub("\\{|\\}","",Sentence)
+    CleanedWords<-gsub("\\{|\\}","",Sentence["words"])
+    CleanedWords<-gsub("\",\"","COMMASUB",CleanedWords)
     CleanedPoses<-gsub("\\{|\\}","",Sentence["poses"])
+    CleanedPoses<-gsub("\",\"","COMMASUB",CleanedPoses)
     SplitPoses<-unlist(strsplit(CleanedPoses,","))
     SplitSentences<-strsplit(CleanedSentences,",")
     NNPs<-which(SplitPoses=="NNP")
@@ -142,9 +146,8 @@ ConsecutiveResults<-lapply(NNPResults,findConsecutive)
  ######################### Find Words Associated with Conescutive NNPs ###########################
  matchWords<-function(Document){
     DDMatches[Document,"words"]
- 
-DDMatches["54eb194ee138237cc91518dc.1",]
- DDMatches["54e9e7f8e138237cc91513e9.976",]
+    DDMatches["54eb194ee138237cc91518dc.1",]
+    DDMatches["54e9e7f8e138237cc91513e9.976",]
  
  NNPWordResults<-pbapply(DDMatches,1,matchWords)
  
