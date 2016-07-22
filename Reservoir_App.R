@@ -23,6 +23,15 @@ Driver <- dbDriver("PostgreSQL") # Establish database driver
 Connection <- dbConnect(Driver, dbname = "labuser", host = "localhost", port = 5432, user = "labuser")
 DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM reservoir_data")
 
+###################### Clean DeepDiveData (remove symbols and add substitutes) #########################
+
+# Remove symbols 
+DeepDiveData[,"words"]<-gsub("\\{|\\}","",DeepDiveData[,"words"])
+DeepDiveData[,"poses"]<-gsub("\\{|\\}","",DeepDiveData[,"poses"])
+# Make a substitute for commas so they are counted correctly as elements for future functions
+DeepDiveData[,"words"]<-gsub("\",\"","COMMASUB",DeepDiveData[,"words"])
+DeepDiveData[,"poses"]<-gsub("\",\"","COMMASUB",DeepDiveData[,"poses"])
+
 ###################################### Create Dictionaries ##############################################
 
 #Select words of interest
@@ -62,12 +71,8 @@ FirstWords<-subset(FirstWords,FirstWords!="The")
 # Get data for the word matches (word match, poses, documentID, and sentenceID)
 
 findPoses<-function(DocRow,FirstDictionary=FirstWords) {
-    CleanedWords<-gsub("\\{|\\}","",DocRow["words"])
-    CleanedWords<-gsub("\",\"","COMMASUB",CleanedWords)
-    CleanedPoses<-gsub("\\{|\\}","",DocRow["poses"])
-    CleanedPoses<-gsub("\",\"","COMMASUB",CleanedPoses)
-    SplitPoses<-unlist(strsplit(CleanedPoses,","))
-    SplitWords<-unlist(strsplit(CleanedWords,","))
+    SplitPoses<-unlist(strsplit(DocRow["poses"],","))
+    SplitWords<-unlist(strsplit(DocRow["words"],","))
   	FoundWords<-SplitWords%in%FirstDictionary
   	
   	# Create columns for final matrix
@@ -76,7 +81,6 @@ findPoses<-function(DocRow,FirstDictionary=FirstWords) {
   	Pose<-SplitPoses[which(FoundWords)]
     DocumentID<-rep(DocRow["docid"],length(MatchedWord))
     SentenceID<-rep(DocRow["sentid"],length(MatchedWord))
-    
 
     # Return the function output
     return(cbind(MatchedWord,WordPosition,Pose,DocumentID,SentenceID))
@@ -120,12 +124,8 @@ DDMatches<-DeepDiveData[unique(DDResultsFrame[,"doc.sent"]),]
 
 # Make function to find NNP words adjacent to the matches in DDResultsFrame
 findNNPs<-function(Sentence) {
-    CleanedWords<-gsub("\\{|\\}","",Sentence["words"])
-    CleanedWords<-gsub("\",\"","COMMASUB",CleanedWords)
-    CleanedPoses<-gsub("\\{|\\}","",Sentence["poses"])
-    CleanedPoses<-gsub("\",\"","COMMASUB",CleanedPoses)
-    SplitPoses<-unlist(strsplit(CleanedPoses,","))
-    SplitSentences<-strsplit(CleanedSentences,",")
+    SplitPoses<-unlist(strsplit(Sentence["poses"],","))
+    SplitSentences<-strsplit(Sentence["words"],",")
     NNPs<-which(SplitPoses=="NNP")
     return(NNPs)
     }
@@ -144,6 +144,7 @@ findConsecutive<-function(NNPPositions) {
 ConsecutiveResults<-lapply(NNPResults,findConsecutive)
  
  ######################### Find Words Associated with Conescutive NNPs ###########################
+ 
  matchWords<-function(Document){
     DDMatches[Document,"words"]
     DDMatches["54eb194ee138237cc91518dc.1",]
