@@ -148,23 +148,25 @@ ConsecutiveResults<-lapply(NNPResults,findConsecutive)
 ######################### Find Words Associated with Conescutive NNPs ###########################
  
 # Note: element values for ConsecutiveResults and DDMatches correspond to the same document
- 
-# Specific Example
-ConsecutiveResults[[1]][3]<-unlist(strsplit(DDMatches[1,"words"],","))[as.numeric(unlist(ConsecutiveResults[[1]][3]))]
- 
-matchWords<-function(Document){
-    NumNNPVectors<-1:length(ConsecutiveResults[[Document]])
-    NNPMatches<-vector("list",length=length(ConsecutiveResults[[Document]]))
-    for(NNPVector in NumNNPVectors){
-        NNPMatches[[Document]][NNPVector]<-unlist(strsplit(DDMatches[1,"words"],","))[as.numeric(unlist(ConsecutiveResults[[Document]][NNPVector]))]
+matchWords<-function(ConsecutiveResults,DDMatches){
+    FinalOutput<-vector("list",length=length(ConsecutiveResults))
+    for (Document in 1:length(ConsecutiveResults)) {
+        DocumentOutput<-vector("list",length=length(ConsecutiveResults[[Document]]))
+        for (NNPCluster in 1:length(ConsecutiveResults[[Document]])) {
+            DocumentOutput[[NNPCluster]]<-unlist(strsplit(DDMatches[Document,"words"],","))[as.numeric(unlist(ConsecutiveResults[[Document]][NNPCluster]))]
+            }
+        FinalOutput[[Document]]<-DocumentOutput
         }
-    return(NNPMatches)
+    return(FinalOutput)
     }
  
-NNPWordResults<-lapply(ConsecutiveResults,matchWords)
+ # Run function and save list as ConsecutiveNNPWords
+ ConsecutiveNNPWords<-matchWords(ConsecutiveResults,DDMatches)
  
  ####################################### Find Word Matches #######################
- 
+
+ # Filter UnitsVector so we can search for abbreviated or short forms of Macrostrat unit names
+ FilteredUnitsVector<-sapply(UnitsVector,function(x) gsub("Alluvium|Amphibolite|Andesite|Anhydrite|Argillite|Arkose|Basalt|Basement|Batholith|Bauxite|Breccia|Chert|Clay|Coal|Colluvium|Complex|Conglomerate|Dolerite|Dolomite|Gabbro|Gneiss|Granite|Granodiorite|Graywacke|Gravel|Greenstone|Gypsum|Latite|Marble|Marl|Metadiabase|Migmatite|Monzonite|Mountains|Mudstone|Limestone|Oolite|Ophiolite|Peat|Phosphorite|Phyllite|Pluton|Quartzite|Rhyolite|Salt|Sand|Sands|Sandstone|Sandstones|Schist|Serpentinite|Shale|Silt|Siltstone|Slate|Suite|Terrane|Till|Tonalite|Tuff|Unit|Volcanic|Volcanics","",x))
  
 ############################## findParents Function (Not Needed) #################################
 
@@ -238,13 +240,5 @@ findNNPs<-function(Sentence, NNP) {
 DDMatches["54eb194ee138237cc91518dc.1",]
 DDMatches["54e9e7f8e138237cc91513e9.976",]
 
-# NNP match function draft
-matchWords<-function(Document){
-    NumNNPVectors<-1:length(Document)
-     NNPMatches<-vector("list",length=length(Document))
-     for(NNPVector in NumNNPVectors){
-         NNPMatches[[Document]][NNPVector]<-unlist(strsplit(DDMatches[1,"words"],","))[as.numeric(unlist(Document[NNPVector]))]
-         }
-     return(NNPMatches)
-     }
- NNPWordResults<-pbapply(ConsecutiveResults,1,matchWords)
+# Specific example getting NNP word matches associated with elements in Consecutive Results list vectors for each document
+ConsecutiveResults[[1]][3]<-unlist(strsplit(DDMatches[1,"words"],","))[as.numeric(unlist(ConsecutiveResults[[1]][3]))]
