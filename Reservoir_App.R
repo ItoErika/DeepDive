@@ -166,7 +166,7 @@ matchWords<-function(ConsecutiveResults,DDMatches){
  ####################################### Find Word Matches #######################
 
  # Filter UnitsVector so we can search for abbreviated or short forms of Macrostrat unit names
- FilteredUnitsVector<-sapply(UnitsVector,function(x) gsub("Alluvium|Amphibolite|Andesite|Anhydrite|Argillite|Arkose|Basalt|Basement|Batholith|Bauxite|Breccia|Chert|Clay|Coal|Colluvium|Complex|Conglomerate|Dolerite|Dolomite|Gabbro|Gneiss|Granite|Granodiorite|Graywacke|Gravel|Greenstone|Gypsum|Latite|Marble|Marl|Metadiabase|Migmatite|Monzonite|Mountains|Mudstone|Limestone|Oolite|Ophiolite|Peat|Phosphorite|Phyllite|Pluton|Quartzite|Rhyolite|Salt|Sand|Sands|Sandstone|Sandstones|Schist|Serpentinite|Shale|Silt|Siltstone|Slate|Suite|Terrane|Till|Tonalite|Tuff|Unit|Volcanic|Volcanics","",x))
+ FilteredUnitsVector<-sapply(UnitsVector,function(x) gsub(" Alluvium| Amphibolite| Andesite| Anhydrite| Argillite| Arkose| Basalt| Basement| Batholith| Bauxite| Breccia| Chert| Clay| Coal| Colluvium| Complex| Conglomerate| Dolerite| Dolomite| Gabbro| Gneiss| Granite| Granodiorite| Graywacke| Gravel| Greenstone| Gypsum| Latite| Marble| Marl| Metadiabase| Migmatite| Monzonite| Mountains| Mudstone| Limestone| Oolite| Ophiolite| Peat| Phosphorite| Phyllite| Pluton| Quartzite| Rhyolite| Salt| Sand| Sands| Sandstone| Sandstones| Schist| Serpentinite| Shale| Silt| Siltstone| Slate| Suite| Terrane| Till| Tonalite| Tuff| Unit| Volcanic| Volcanics","",x))
  
 ############################## findParents Function (Not Needed) #################################
 
