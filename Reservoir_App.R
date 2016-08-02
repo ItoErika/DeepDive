@@ -157,12 +157,14 @@ matchWords<-function(ConsecutiveResults,DDMatches){
             }
         FinalOutput[[Document]]<-DocumentOutput
         }
-    return(FinalOutput)
+    names(FinalOutput)<-names(ConsecutiveResults)
+    SentID<-names(FinalOutput[Document])
+    Cluster<-FinalOutput[[Document]][NNPCluster]
+    return(cbind(SentID,Cluster))
     }
  
  # Run function and save list as ConsecutiveNNPWords
  ConsecutiveNNPWords<-matchWords(ConsecutiveResults,DDMatches)
- names(ConsecutiveNNPWords)<-names(ConsecutiveResults)
  
  ####################################### Find Word Matches #######################
 
