@@ -162,6 +162,7 @@ matchWords<-function(ConsecutiveResults,DDMatches){
  
  # Run function and save list as ConsecutiveNNPWords
  ConsecutiveNNPWords<-matchWords(ConsecutiveResults,DDMatches)
+ names(ConsecutiveNNPWords)<-names(ConsecutiveResults)
  
  ####################################### Find Word Matches #######################
 
