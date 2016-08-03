@@ -143,7 +143,6 @@ rownames(NNPResultsMatrix)<-1:dim(NNPResultsMatrix)[1]
 # Add sentence ID data to NNPResultsMatrix
 # Find the number of NNP matches for each sentence
 MatchCount<-sapply(NNPResults,nrow)
-
 # Create a column for NNPResultsMatrix for sentence IDs
 NNPResultsMatrix<-cbind(NNPResultsMatrix,rep(names(NNPResults),times=MatchCount))
 # Name the column
@@ -171,6 +170,31 @@ Consecutive<-tapply(NNPResultsFrame[,"NNPs"], NNPResultsFrame[,"SentID"],findCon
 ConsecutiveNNPs<-sapply(Consecutive,function(y) sapply(y,function(x) paste(x,collapse=",")))
 
 # Create a matrix with a row for each NNP cluster
+# Make a column for sentence IDs
+ClusterCount<-sapply(ConsecutiveNNPs,length)
+SentID<-rep(names(ConsecutiveNNPs),times=ClusterCount)
+# Make a column for clusters 
+Cluster<-unlist(ConsecutiveNNPs)
+names(Cluster)<-SentID
+# Make a column for the words associated with each NNP
+# Get numeric elements for each NNP
+NNPElements<-lapply(Cluster,function(x) as.numeric(unlist(strsplit(x,","))))
+names(NNPElements)<-SentID
+
+
+getWords<-function(DDMatches,NNPElements){
+    NNPWords<-vector("list",length=length(NNPElements))
+    for(Document in 1:length(NNPElements)){
+    NNPWords[Document]<-unlist(strsplit(DDMatches[names(NNPElements[Document]),"words"],","))[NNPElements[Document]]
+    }
+    return(NNPWords)
+    }
+
+NNPWords<-pbapply(DDMatches,1,getWords,NNPElements) 
+
+# Bind columns into matrix
+NNPClusterMatrix<-cbind(SentID,Cluster)
+
  
 ######################### Find Words Associated with Conescutive NNPs ###########################
  
