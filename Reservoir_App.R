@@ -124,16 +124,38 @@ DDResultsFrame[,"doc.sent"]=docID.sentID
 # Create a subset of DeepDiveData that only contains data for document sentence pairs from DDResultsFrame
 DDMatches<-DeepDiveData[unique(DDResultsFrame[,"doc.sent"]),]
 
-# Make function to find NNP words adjacent to the matches in DDResultsFrame
+# Make function to find NNP words in DDMatches
 findNNPs<-function(Sentence) {
     SplitPoses<-unlist(strsplit(Sentence["poses"],","))
-    SplitSentences<-strsplit(Sentence["words"],",")
+    SplitSentences<-unlist(strsplit(Sentence["words"],","))
     NNPs<-which(SplitPoses=="NNP")
-    return(NNPs)
+    NNPWords<-SplitSentences[NNPs]
+    return(cbind(NNPs,NNPWords))
     }
     
 # Apply findNNPs function to DDMatches
 NNPResults<-pbapply(DDMatches,1,findNNPs)
+
+# Create matrix of NNPResults
+NNPResultsMatrix<-do.call(rbind,NNPResults)
+rownames(NNPResultsMatrix)<-1:dim(NNPResultsMatrix)[1]
+
+# Add sentence ID data to NNPResultsMatrix
+# Find the number of NNP matches for each sentence
+MatchCount<-sapply(NNPResults,nrow)
+
+# Create a column for NNPResultsMatrix for sentence IDs
+NNPResultsMatrix<-cbind(NNPResultsMatrix,rep(names(NNPResults),times=MatchCount))
+# Name the column
+colnames(NNPResultsMatrix)[3]<-"SentID"
+
+# Convert matrix into data frame to hold different types of data
+NNPResultsFrame<-as.data.frame(NNPResultsMatrix)
+
+# Make sure data in columns are in the correct format
+NNPResultsFrame[,"NNPs"]<-as.numeric(as.character(NNPResultsFrame[,"NNPs"]))
+NNPResultsFrame[,"NNPWords"]<-as.character(NNPResultsFrame[,"NNPWords"])
+NNPResultsFrame[,"SentID"]<-as.character(NNPResultsFrame[,"SentID"])
 
 ##################################### Find Consecutive NNPs ######################################
 
@@ -143,7 +165,12 @@ findConsecutive<-function(NNPPositions) {
     return(ConsecutiveList)
     }
 
-ConsecutiveResults<-lapply(NNPResults,findConsecutive)
+# Find consecutive NNPs for each SentID
+Consecutive<-tapply(NNPResultsFrame[,"NNPs"], NNPResultsFrame[,"SentID"],findConsecutive)
+# Collapse the consecutive NNP clusters into single character strings
+ConsecutiveNNPs<-sapply(Consecutive,function(y) sapply(y,function(x) paste(x,collapse=",")))
+
+# Create a matrix with a row for each NNP cluster
  
 ######################### Find Words Associated with Conescutive NNPs ###########################
  
@@ -157,9 +184,24 @@ matchWords<-function(ConsecutiveResults,DDMatches){
             }
         FinalOutput[[Document]]<-DocumentOutput
         }
-    names(FinalOutput)<-names(ConsecutiveResults)
-    SentID<-names(FinalOutput[Document])
-    Cluster<-FinalOutput[[Document]][NNPCluster]
+        
+    
+    # Get names which represent document and sentence ID 
+    Names<-names(ConsecutiveResults)
+    # Get number of NNP clusters for each name (for each sentence)
+    Times<-sapply(ConsecutiveResults,length)
+    
+    # Create matrix columns
+    # Create a name representing document and sentence ID for each NNP cluster
+    SentID<-rep(Names,times=Times)
+    Cluster<-
+    
+    test<-ConsecutiveResults[1:100]
+    sapply(test, function(x) as.numeric(unlist(x)))
+    sapply(test, as.numeric)
+Error in lapply(X = X, FUN = FUN, ...) : 
+  (list) object cannot be coerced to type 'double'
+    
     return(cbind(SentID,Cluster))
     }
  
