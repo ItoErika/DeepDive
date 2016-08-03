@@ -169,6 +169,8 @@ Consecutive<-tapply(NNPResultsFrame[,"NNPs"], NNPResultsFrame[,"SentID"],findCon
 # Collapse the consecutive NNP clusters into single character strings
 ConsecutiveNNPs<-sapply(Consecutive,function(y) sapply(y,function(x) paste(x,collapse=",")))
 
+######################### Find Words Associated with Conescutive NNPs ###########################
+
 # Create a matrix with a row for each NNP cluster
 # Make a column for sentence IDs
 ClusterCount<-sapply(ConsecutiveNNPs,length)
@@ -181,56 +183,16 @@ names(Cluster)<-SentID
 NNPElements<-lapply(Cluster,function(x) as.numeric(unlist(strsplit(x,","))))
 names(NNPElements)<-SentID
 
-
-getWords<-function(DDMatches,NNPElements){
-    NNPWords<-vector("list",length=length(NNPElements))
-    for(Document in 1:length(NNPElements)){
-    NNPWords[Document]<-unlist(strsplit(DDMatches[names(NNPElements[Document]),"words"],","))[NNPElements[Document]]
+NNPWords<-vector("character",length=length(NNPElements))
+for(Document in 1:length(NNPElements)){
+    ExtractElements<-NNPElements[[Document]]
+    DocumentName<-names(NNPElements)[Document]
+    SplitWords<-unlist(strsplit(DDMatches[DocumentName,"words"],","))
+    NNPWords[Document]<-paste(SplitWords[ExtractElements],collapse=" ")
     }
-    return(NNPWords)
-    }
-
-NNPWords<-pbapply(DDMatches,1,getWords,NNPElements) 
 
 # Bind columns into matrix
-NNPClusterMatrix<-cbind(SentID,Cluster)
-
- 
-######################### Find Words Associated with Conescutive NNPs ###########################
- 
-# Note: element values for ConsecutiveResults and DDMatches correspond to the same document
-matchWords<-function(ConsecutiveResults,DDMatches){
-    FinalOutput<-vector("list",length=length(ConsecutiveResults))
-    for (Document in 1:length(ConsecutiveResults)) {
-        DocumentOutput<-vector("list",length=length(ConsecutiveResults[[Document]]))
-        for (NNPCluster in 1:length(ConsecutiveResults[[Document]])) {
-            DocumentOutput[[NNPCluster]]<-unlist(strsplit(DDMatches[Document,"words"],","))[as.numeric(unlist(ConsecutiveResults[[Document]][NNPCluster]))]
-            }
-        FinalOutput[[Document]]<-DocumentOutput
-        }
-        
-    
-    # Get names which represent document and sentence ID 
-    Names<-names(ConsecutiveResults)
-    # Get number of NNP clusters for each name (for each sentence)
-    Times<-sapply(ConsecutiveResults,length)
-    
-    # Create matrix columns
-    # Create a name representing document and sentence ID for each NNP cluster
-    SentID<-rep(Names,times=Times)
-    Cluster<-
-    
-    test<-ConsecutiveResults[1:100]
-    sapply(test, function(x) as.numeric(unlist(x)))
-    sapply(test, as.numeric)
-Error in lapply(X = X, FUN = FUN, ...) : 
-  (list) object cannot be coerced to type 'double'
-    
-    return(cbind(SentID,Cluster))
-    }
- 
- # Run function and save list as ConsecutiveNNPWords
- ConsecutiveNNPWords<-matchWords(ConsecutiveResults,DDMatches)
+NNPClusterMatrix<-cbind(SentID,Cluster,NNPWords)
  
  ####################################### Find Word Matches #######################
 
@@ -311,3 +273,20 @@ DDMatches["54e9e7f8e138237cc91513e9.976",]
 
 # Specific example getting NNP word matches associated with elements in Consecutive Results list vectors for each document
 ConsecutiveResults[[1]][3]<-unlist(strsplit(DDMatches[1,"words"],","))[as.numeric(unlist(ConsecutiveResults[[1]][3]))]
+
+
+#Draft 1 for finding NNP Words associated with consecutive element clusters
+# Note: element values for ConsecutiveResults and DDMatches correspond to the same document
+matchWords<-function(ConsecutiveResults,DDMatches){
+    FinalOutput<-vector("list",length=length(ConsecutiveResults))
+    for (Document in 1:length(ConsecutiveResults)) {
+        DocumentOutput<-vector("list",length=length(ConsecutiveResults[[Document]]))
+        for (NNPCluster in 1:length(ConsecutiveResults[[Document]])) {
+            DocumentOutput[[NNPCluster]]<-unlist(strsplit(DDMatches[Document,"words"],","))[as.numeric(unlist(ConsecutiveResults[[Document]][NNPCluster]))]
+            }
+        FinalOutput[[Document]]<-DocumentOutput
+        return(FinalOutput)
+        }
+ 
+ # Run function and save list as ConsecutiveNNPWords
+ ConsecutiveNNPWords<-matchWords(ConsecutiveResults,DDMatches)
