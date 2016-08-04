@@ -320,4 +320,7 @@ matchWords<-function(ConsecutiveResults,DDMatches){
  ConsecutiveNNPWords<-matchWords(ConsecutiveResults,DDMatches)
  
  # Save data frame
- write.CSV(Object_Name, "Name_Of_Saved_File_Or_Folder.csv")
+ write.csv(Object_Name, "Name_Of_Saved_File_Or_Folder.csv")
+ 
+ # Load data frame
+ Object_Name = read.csv("Name_Of_Saved_File_Or_Folder.csv", header = TRUE)
