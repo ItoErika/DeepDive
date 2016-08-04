@@ -215,7 +215,12 @@ for (Row in 1:length(CompleteMatchRows)){
 ####################################### Find partial unit matches #################################
 
 # Subset NNPClusterFrame so it does not include complete unit matches
+SubsetFrame1<-data.frame(matrix(NA,ncol = 3, nrow = (nrow(NNPClusterFrame)-length(CompleteMatchRows))))
+for(Row in 1:(nrow(NNPClusterFrame-length(CompleteMatchRows)))){
+    SubsetFrame1[Row,]<-setdiff(NNPClusterFrame[,"NNPWords"],MatchFrame1[,"X3"])
+    }
 
+# Search for rows with two word matches in SubsetFrame1
 
 
 
