@@ -175,9 +175,9 @@ ConsecutiveNNPs<-sapply(Consecutive,function(y) sapply(y,function(x) paste(x,col
 # Make a column for sentence IDs
 ClusterCount<-sapply(ConsecutiveNNPs,length)
 SentID<-rep(names(ConsecutiveNNPs),times=ClusterCount)
-# Make a column for clusters 
-Cluster<-unlist(ConsecutiveNNPs)
-names(Cluster)<-SentID
+# Make a column for cluster elements 
+ClusterPosition<-unlist(ConsecutiveNNPs)
+names(ClusterPosition)<-SentID
 # Make a column for the words associated with each NNP
 # Get numeric elements for each NNP
 NNPElements<-lapply(Cluster,function(x) as.numeric(unlist(strsplit(x,","))))
@@ -191,8 +191,36 @@ for(Document in 1:length(NNPElements)){
     NNPWords[Document]<-paste(SplitWords[ExtractElements],collapse=" ")
     }
 
-# Bind columns into matrix
-NNPClusterMatrix<-cbind(SentID,Cluster,NNPWords)
+# Bind columns into data frame 
+NNPClusterMatrix<-cbind(NNPWords,ClusterPostition,SentID)
+rownames(NNPClusterMatrix)<-NULL
+NNPClusterFrame<-as.data.frame(NNPClusterMatrix)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
  ####################################### Find Word Matches #######################
 
