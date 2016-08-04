@@ -192,15 +192,35 @@ for(Document in 1:length(NNPElements)){
     }
 
 # Bind columns into data frame 
-NNPClusterMatrix<-cbind(NNPWords,ClusterPostition,SentID)
+NNPClusterMatrix<-cbind(NNPWords,ClusterPosition,SentID)
 rownames(NNPClusterMatrix)<-NULL
 NNPClusterFrame<-as.data.frame(NNPClusterMatrix)
 
+# Make sure all of the columns are in the correct data format
+NNPClusterFrame[,"NNPWords"]<-as.character(NNPClusterFrame[,"NNPWords"])
+NNPClusterFrame[,"ClusterPosition"]<-as.numeric(as.character(NNPClusterFrame[,"ClusterPosition"]))
+NNPClusterFrame[,"SentID"]<-as.character(NNPClusterFrame[,"SentID"])
+
+####################################### Find Complete Unit Matches ##############################
+
+# Find NNPClusterFrame rows in which full unit names appear
+CompleteMatchRows<-which(NNPClusterFrame[,"NNPWords"]%in%UnitsVector)
+
+# Subset the NNPClusterFrame so that only CompleteMatchRows are shown
+MatchFrame1<-data.frame(matrix(NA,ncol = 3, nrow = length(CompleteMatchRows)))
+for (Row in 1:length(CompleteMatchRows)){
+    MatchFrame1[Row,]<-NNPClusterFrame[as.numeric(CompleteMatchRows[Row]),]
+    }
+
+####################################### Find partial unit matches #################################
+
+# Subset NNPClusterFrame so it does not include complete unit matches
 
 
 
 
 
+# Find possible, uncertain unit matches 
 
 
 
