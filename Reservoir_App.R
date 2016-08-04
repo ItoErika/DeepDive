@@ -318,3 +318,6 @@ matchWords<-function(ConsecutiveResults,DDMatches){
  
  # Run function and save list as ConsecutiveNNPWords
  ConsecutiveNNPWords<-matchWords(ConsecutiveResults,DDMatches)
+ 
+ # Save data frame
+ write.CSV(Object_Name, "Name_Of_Saved_File_Or_Folder.csv")
