@@ -180,7 +180,7 @@ ClusterPosition<-unlist(ConsecutiveNNPs)
 names(ClusterPosition)<-SentID
 # Make a column for the words associated with each NNP
 # Get numeric elements for each NNP
-NNPElements<-lapply(Cluster,function(x) as.numeric(unlist(strsplit(x,","))))
+NNPElements<-lapply(ClusterPosition,function(x) as.numeric(unlist(strsplit(x,","))))
 names(NNPElements)<-SentID
 
 NNPWords<-vector("character",length=length(NNPElements))
