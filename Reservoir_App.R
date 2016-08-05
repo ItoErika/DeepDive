@@ -198,7 +198,7 @@ NNPClusterFrame<-as.data.frame(NNPClusterMatrix)
 
 # Make sure all of the columns are in the correct data format
 NNPClusterFrame[,"NNPWords"]<-as.character(NNPClusterFrame[,"NNPWords"])
-NNPClusterFrame[,"ClusterPosition"]<-as.numeric(as.character(NNPClusterFrame[,"ClusterPosition"]))
+NNPClusterFrame[,"ClusterPosition"]<-as.character(NNPClusterFrame[,"ClusterPosition"])
 NNPClusterFrame[,"SentID"]<-as.character(NNPClusterFrame[,"SentID"])
 
 ####################################### Find Complete Unit Matches ##############################
@@ -207,25 +207,52 @@ NNPClusterFrame[,"SentID"]<-as.character(NNPClusterFrame[,"SentID"])
 CompleteMatchRows<-which(NNPClusterFrame[,"NNPWords"]%in%UnitsVector)
 
 # Subset the NNPClusterFrame so that only CompleteMatchRows are shown
-MatchFrame1<-data.frame(matrix(NA,ncol = 3, nrow = length(CompleteMatchRows)))
+MatchFrame1<-data.frame(matrix(NA,ncol = 3, nrow = length(CompleteMatchRows)),stringsAsFactors=False)
 for (Row in 1:length(CompleteMatchRows)){
     MatchFrame1[Row,]<-NNPClusterFrame[as.numeric(CompleteMatchRows[Row]),]
     }
+    
+# Create column names for MatchFrame1 to match NNPClusterMatrix
+colnames(MatchFrame1)<-colnames(NNPClusterFrame)
 
 ####################################### Find partial unit matches #################################
 
 # Subset NNPClusterFrame so it does not include complete unit matches
-SubsetFrame1<-data.frame(matrix(NA,ncol = 3, nrow = (nrow(NNPClusterFrame)-length(CompleteMatchRows))))
-for(Row in 1:(nrow(NNPClusterFrame-length(CompleteMatchRows)))){
-    SubsetFrame1[Row,]<-setdiff(NNPClusterFrame[,"NNPWords"],MatchFrame1[,"X3"])
+# This function is the opposite of %in%
+'%!in%' <- function(x,y)!('%in%'(x,y))
+IncompleteMatchRows<-which(NNPClusterFrame[,"NNPWords"]%!in%UnitsVector)
+SubsetFrame1<-data.frame(matrix(NA,ncol = 3, nrow = length(IncompleteMatchRows)))
+for (Row in 1:length(IncompleteMatchRows)){
+    SubsetFrame1[Row,]<-NNPClusterFrame[as.numeric(IncompleteMatchRows[Row]),]
+    }
+#Create column names for MatchFrame1 to match NNPClusterMatrix
+colnames(SubsetFrame1)<-colnames(NNPClusterFrame)
+
+# Split each unit name in units vector into separated words
+SplitUnits<-vector("list",length=length(UnitsVector))
+for(Unit in 1:length(UnitsVector)){
+    SplitUnits[[Unit]]<-unlist(strsplit(UnitsVector[Unit]," "))
+    }
+    
+# Split each character string in SubsetFrame1[,"NNPWords"] into separated words
+SplitNNPs<-vector("list",length=length(SubsetFrame1[,"NNPWords"]))
+for(Row in 1:length(SubsetFrame1[,"NNPWords"])){
+    SplitNNPs[[Row]]<-unlist(strsplit(SubsetFrame1[Row,"NNPWords"], " "))
     }
 
-# Search for rows with two word matches in SubsetFrame1
+# Search words from Split Units that match with Split NNPs
+MatchWords<-intersect(unlist(SplitNNPs),unlist(SplitUnits))
 
+# Locate the Matches in SplitNNPs
+    Matches<-vector("list",length=length(SplitNNPs))
+    for(Element in 1:length(SplitNNPs)){
+    Matches[[Element]]<-SplitNNPs[[Element]]%in%MatchWords
+    }
 
+# Create a match column for SubsetFrame1
+MatchColumn<-sapply(Matches,function(x) paste(x,collapse="  "))
+SubsetFrame1["Matches"]<-MatchColumn
 
-
-# Find possible, uncertain unit matches 
 
 
 
