@@ -235,9 +235,9 @@ for(Unit in 1:length(UnitsVector)){
     }
     
 # Split each character string in SubsetFrame1[,"NNPWords"] into separated words
-SplitNNPs<-vector("list",length=length(SubsetFrame1[,"NNPWords"]))
+SplitNNPs1<-vector("list",length=length(SubsetFrame1[,"NNPWords"]))
 for(Row in 1:length(SubsetFrame1[,"NNPWords"])){
-    SplitNNPs[[Row]]<-unlist(strsplit(SubsetFrame1[Row,"NNPWords"], " "))
+    SplitNNPs1[[Row]]<-unlist(strsplit(SubsetFrame1[Row,"NNPWords"], " "))
     }
 
 # Search words from Split Units that match with Split NNPs
@@ -253,6 +253,28 @@ MatchWords<-intersect(unlist(SplitNNPs),unlist(SplitUnits))
 MatchColumn<-sapply(Matches,function(x) paste(x,collapse="  "))
 SubsetFrame1["Matches"]<-MatchColumn
 
+###################################### Search For General/Common Unit Words ########################################
+
+# Create a dictionary of common unit words
+ComUnitWords<-c("Member","Mbr","Formation","Fm","Group","Grp","Supergroup","Strata","Stratum","SprGrp","Spgrp","Unit","Complex","Cmplx","Cplx","Ste","Basement","Pluton","Shale","Alluvium","Amphibolite","Andesite","Anhydrite","Argillite","Arkose","Basalt","Batholith","Bauxite","Breccia","Chert","Clay","Coal","Colluvium","Complex","Conglomerate","Dolerite","Dolomite","Gabbro","Gneiss","Granite","Granodiorite","Graywacke","Gravel","Greenstone","Gypsum","Latite","Marble","Marl","Metadiabase","Migmatite","Monzonite","Mountains","Mudstone", "Limestone","Lm","Oolite","Ophiolite","Peat","Phosphorite","Phyllite","Pluton","Quartzite","Rhyolite","Salt","Sand","Sands","Sandstone","SS","Sandstones","Schist","Serpentinite","Shale","Silt","Siltstone","Slate","Suite","Sui","Terrane","Till","Tonalite","Tuff","Unit","Volcanic","Volcanics")
+
+# Split each character string in NNPClusterFrame[,"NNPWords"] into separated words
+SplitNNPs2<-vector("list",length=length(NNPClusterFrame[,"NNPWords"]))
+for(Row in 1:length(NNPClusterFrame[,"NNPWords"])){
+    SplitNNPs2[[Row]]<-unlist(strsplit(NNPClusterFrame[Row,"NNPWords"], " "))
+    }
+
+MatchWords2<-intersect(unlist(SplitNNPs2),ComUnitWords)
+
+# Locate the Matches in SplitNNPs2
+    Matches2<-vector("list",length=length(SplitNNPs2))
+    for(Element in 1:length(SplitNNPs2)){
+    Matches2[[Element]]<-SplitNNPs2[[Element]]%in%MatchWords2
+    }
+
+# Add a column for common unit word matches 
+MatchColumn2<-sapply(Matches2,function(x) paste(x,collapse="  "))
+NNPClusterFrame["Matches"]<-MatchColumn2
 
 
 
