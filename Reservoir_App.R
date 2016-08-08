@@ -276,7 +276,7 @@ MatchWords2<-intersect(unlist(SplitNNPs2),ComUnitWords)
 MatchColumn2<-sapply(Matches2,function(x) paste(x,collapse="  "))
 NNPClusterFrame["Matches"]<-MatchColumn2
 
-
+# Use any() function applied to each row of NNPClusterFrame[,"Matches"] to get back rows which have "TRUE"
 
 
 
