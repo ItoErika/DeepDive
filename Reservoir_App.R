@@ -240,7 +240,7 @@ for(Row in 1:length(SubsetFrame1[,"NNPWords"])){
     SplitNNPs1[[Row]]<-unlist(strsplit(SubsetFrame1[Row,"NNPWords"], " "))
     }
 
-# Search words from Split Units that match with Split NNPs
+# Search for words from Split Units that match with Split NNPs
 MatchWords<-intersect(unlist(SplitNNPs),unlist(SplitUnits))
 
 # Locate the Matches in SplitNNPs
