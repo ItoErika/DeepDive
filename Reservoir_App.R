@@ -77,7 +77,7 @@ colnames(DF5)[2]<-"unit"
 Units1<-rbind(DF1,DF2,DF3,DF4,DF5)
 
 # Create a dictionary of common unit words
-ComUnitWords<-c("allochthon","bed","beds","member","mbr","formation","fm","group","grp","soil","supergroup","strata","stratum","sprGrp","spgrp","sGp","unit","complex","cmplx","cplx","ste","basement","pluton","shale","alluvium","amphibolite","andesite","anhydrite","argillite","arkose","basalt","batholith","bauxite","breccia","chalk","chert","clay","coal","colluvium","conglomerate","diorite","dolerite","dolomite","gabbro","gneiss","gp","granite","granite,","granodiorite","graywacke","gravel","greenstone","gypsum","intrustion","latite","loess","marble","marl","metadacite","metadiabase","metagabbro","metagranite","metasediments","microdiorite","migmatite","monzonite","mountain","mountains","mudstone", "limestone","lm","ls","oolite","ophiolite","paleosol","peat","phosphorite","phyllite","pluton","plutonic","quartzite","range","rhyolite","rhyolites","salt","sand","sands","sandstone","sS","ss","sandstones","schist","SCHIST","serpentinite","sequence","shale","silt","siltstone","slate","suite","sui","terrane","till","tills","tillite","tonalite","tuff","unit","volcanic","volcanics")
+ComUnitWords<-c("allochthon","bed","beds","bentonite","member","mbr","formation","fm","group","grp","soil","supergroup","strata","stratum","sprGrp","spgrp","sGp","unit","complex","cmplx","cplx","ste","basement","pluton","shale","alluvium","amphibolite","andesite","anhydrite","argillite","arkose","basalt","batholith","bauxite","breccia","chalk","chert","clay","coal","colluvium","conglomerate","diorite","dolerite","dolomite","gabbro","gneiss","gp","granite","granite,","granodiorite","graywacke","gravel","greenstone","gypsum","intrustion","latite","loess","marble","marl","metadacite","metadiabase","metagabbro","metagranite","metasediments","microdiorite","migmatite","monzonite","mountain","mountains","mudstone", "limestone","lm","ls","oolite","ophiolite","paleosol","peat","phosphorite","phyllite","pluton","plutonic","quartzite","range","rhyolite","rhyolites","salt","sand","sands","sandstone","sS","ss","sandstones","schist","SCHIST","serpentinite","sequence","shale","silt","siltstone","slate","suite","sui","terrane","till","tills","tillite","tonalite","tuff","unit","volcanic","volcanics")
 # Make vector of upper case words and add it to the original vector
 ComUnitWords<-c(ComUnitWords,gsub("(^[[:alpha:]])", "\\U\\1", ComUnitWords, perl=TRUE))
 
@@ -105,6 +105,55 @@ UnitStrings<-sapply(FilteredUnits, function(x) paste (x,collapse=" "))
 
 # Add UnitStrings as column back into Units1 dataframe
 Units1[,"filtered_units"]<-UnitStrings
+
+# Create member, formation, group, and supergroup dataframes
+
+# For the member dataframe:
+# First create a dictionary of abbreviations and member titles
+MembersDictionary<-c("mbr","member","Mbr","Member","MEMBER")
+# Create a list of unique member names
+Members<-unique(DF2[,"unit"])
+# Duplicate the Mebers names so each word in MembersDictionary is paired with each name.
+DuplicatedMembers<-sapply(Members, function(x) paste(rep(Members[x],length(MembersDictionary)),MembersDictionary))
+
+# For the formation data frame:
+# First create a dictionary of abbreviations and formation titles
+FormationsDictionary<-c("fm","Fm","formation","Formation","FORMATION")
+# Create a list of unique formation names
+Formations<-unique(DF3[,"unit"])
+# Duplicate the Formation names so each word in FormationsDictionary is paired with each name.
+DuplicatedFormations<-sapply(Formations, function(x) paste(rep(Formations[x],length(FormationsDictionary)),FormationsDictionary))
+
+# For the group data frame: 
+# First create a dictionary of abbreviations and group titles
+GroupsDictionary<-c("gp","Gp","grp","GRP","group","Group","GROUP")
+# Create a list of unique group names 
+Groups<-unique(DF4[,"unit"])
+#Duplicate the group names so each word in GroupsDictionary is paired with each name 
+DuplicatedGroups<-sapply(Groups, function(x) paste(rep(Groups[x],length(GroupsDictionary)),GroupsDictionary))
+
+# For the supergroup data frame:
+# First create a dictionary of abbreviations and supergroup titles
+SupergroupsDictionary<-c("sprGrp","SprGrp","sprgrp","spgrp","SpGrp","spGrp","spgp","sGp","SGp","supergroup","Supergroup","SuperGroup")
+# Create a list of unique supergroup names 
+Supergroups<-unique(DF5[,"unit"])
+#Duplicate the supergroup names so each word in SupergroupsDictionary is paired with each name 
+DuplicatedSupergroups<-sapply(Supergroups, function(x) paste(rep(Supergroups[x],length(SupergroupsDictionary)),SupergroupsDictionary))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Create another dataframe of all combinations of unit names 
 
