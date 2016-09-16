@@ -77,10 +77,22 @@ colnames(DF5)[2]<-"unit"
 Units1<-rbind(DF1,DF2,DF3,DF4,DF5)
 
 # Create a dictionary of common unit words
-ComUnitWords<-c("Member","Mbr","Formation","Fm","Group","Grp","Supergroup","Strata","Stratum","SprGrp","Spgrp","Unit","Complex","Cmplx","Cplx","Ste","Basement","Pluton","Shale","Alluvium","Amphibolite","Andesite","Anhydrite","Argillite","Arkose","Basalt","Batholith","Bauxite","Breccia","Chert","Clay","Coal","Colluvium","Complex","Conglomerate","Dolerite","Dolomite","Gabbro","Gneiss","Granite","Granodiorite","Graywacke","Gravel","Greenstone","Gypsum","Latite","Marble","Marl","Metadiabase","Migmatite","Monzonite","Mountains","Mudstone", "Limestone","Lm","Ls","Oolite","Ophiolite","Peat","Phosphorite","Phyllite","Pluton","Plutonic","Quartzite","Range","Rhyolite","Salt","Sand","Sands","Sandstone","SS","Sandstones","Schist","Serpentinite","Shale","Silt","Siltstone","Slate","Suite","Sui","Terrane","Till","Tonalite","Tuff","Unit","Volcanic","Volcanics")
+ComUnitWords<-c("member","mbr","formation","fm","group","grp","supergroup","strata","stratum","sprGrp","spgrp","unit","complex","cmplx","cplx","ste","basement","pluton","shale","alluvium","amphibolite","andesite","anhydrite","argillite","arkose","basalt","batholith","bauxite","breccia","chert","clay","coal","colluvium","conglomerate","dolerite","dolomite","gabbro","gneiss","granite","granodiorite","graywacke","gravel","greenstone","gypsum","latite","marble","marl","metadiabase","migmatite","monzonite","mountain","mountains","mudstone", "limestone","lm","ls","oolite","ophiolite","peat","phosphorite","phyllite","pluton","plutonic","quartzite","range","rhyolite","salt","sand","sands","sandstone","sS","ss","sandstones","schist","serpentinite","shale","silt","siltstone","slate","suite","sui","terrane","till","tonalite","tuff","unit","volcanic","volcanics")# Make vector of upper case words and add it to the original vector
+# Make vector of upper case words and add it to the original vector
+ComUnitWords<-c(ComUnitWords,gsub("(^[[:alpha:]])", "\\U\\1", ComUnitWords, perl=TRUE))
 
 # Remove all common unit words from "unit" column in Units1
-
+# Split each character string in "unit" column into separated words 
+NumRows<-1:dim(Units1)[1]
+SplitUnits<-vector("list",length=length(Units1[,"unit"]))
+for(Row in NumRows){
+    SplitUnits[[Row]]<-strsplit((as.character(Units1[,"unit"][Row]))," ")
+    }
+  
+# Remove common unit words from each element in list
+FilteredUnits<-vector("list",length=length(SplitUnits))
+ for(Element in 1:length(SplitUnits)){
+    FilteredUnits[[Element]]<-unlist(SplitUnits[[Element]])%in%ComUnitWords}
 
 
 
