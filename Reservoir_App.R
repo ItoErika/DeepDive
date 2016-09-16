@@ -37,26 +37,49 @@ V1<-UnitsFrame[,(names(UnitsFrame)%in%GoodCols)]
 # For unit names and unit id #s:
 GoodCols<-c("unit_id","unit_name")
 DF1<-V1[,(names(V1)%in%GoodCols)]
+
 # For member names and unit id #s:
 GoodCols<-c("unit_id","Mbr")
 DF2<-V1[,(names(V1)%in%GoodCols)]
+# Get rid of rows with empty member name columns
+GoodRows<-which(DF2[,"Mbr"]!="")
+DF2<-DF2[GoodRows,]
+
 # For formation names and unit id #s:
 GoodCols<-c("unit_id","Fm")
 DF3<-V1[,(names(V1)%in%GoodCols)]
+# Get rid of rows with empty member name columns
+GoodRows<-which(DF3[,"Fm"]!="")
+DF3<-DF3[GoodRows,]
+
 # For group names and unit id #s
 GoodCols<-c("unit_id","Gp")
 DF4<-V1[,(names(V1)%in%GoodCols)]
+# Get rid of rows with empty group name columns
+GoodRows<-which(DF4[,"Gp"]!="")
+DF4<-DF4[GoodRows,]
+
 # For supergroup names and unit id #s
 GoodCols<-c("unit_id","SGp")
 DF5<-V1[,(names(V1)%in%GoodCols)]
+# Get rid of rows with empty supergroup name columns
+GoodRows<-which(DF5[,"SGp"]!="")
+DF5<-DF5[GoodRows,]
+
+# Change column names of dataframes to match each other
+colnames(DF1)[2]<-"unit"
+colnames(DF2)[2]<-"unit"
+colnames(DF3)[2]<-"unit"
+colnames(DF4)[2]<-"unit"
+colnames(DF5)[2]<-"unit"
 
 # Stitch DF1, DF2, DF3, DF4, and DF5 into single dataframe
+Units1<-rbind(DF1,DF2,DF3,DF4,DF5)
 
+# Create a dictionary of common unit words
+ComUnitWords<-c("Member","Mbr","Formation","Fm","Group","Grp","Supergroup","Strata","Stratum","SprGrp","Spgrp","Unit","Complex","Cmplx","Cplx","Ste","Basement","Pluton","Shale","Alluvium","Amphibolite","Andesite","Anhydrite","Argillite","Arkose","Basalt","Batholith","Bauxite","Breccia","Chert","Clay","Coal","Colluvium","Complex","Conglomerate","Dolerite","Dolomite","Gabbro","Gneiss","Granite","Granodiorite","Graywacke","Gravel","Greenstone","Gypsum","Latite","Marble","Marl","Metadiabase","Migmatite","Monzonite","Mountains","Mudstone", "Limestone","Lm","Ls","Oolite","Ophiolite","Peat","Phosphorite","Phyllite","Pluton","Plutonic","Quartzite","Range","Rhyolite","Salt","Sand","Sands","Sandstone","SS","Sandstones","Schist","Serpentinite","Shale","Silt","Siltstone","Slate","Suite","Sui","Terrane","Till","Tonalite","Tuff","Unit","Volcanic","Volcanics")
 
-# Remove unnecessary columns from UnitsFrame
-BadCols<-c("project_id","col_area","pbdb_occurrences","pbdb_collections")
-UnitsFrame<-UnitsFrame[,!(names(UnitsFrame)%in%BadCols)]
-
+# Remove all common unit words from "unit" column in Units1
 
 
 
@@ -80,5 +103,3 @@ UnitsVector<-c(as.character(UnitsFrame[,"unit_name"],UnitsFrame[,"Mbr"]),as.char
 UnitsVector<-unique(UnitsVector)
 Units<-subset(UnitsVector,UnitsVector!="")
 
-# Create a dictionary of common unit words
-ComUnitWords<-c("Member","Mbr","Formation","Fm","Group","Grp","Supergroup","Strata","Stratum","SprGrp","Spgrp","Unit","Complex","Cmplx","Cplx","Ste","Basement","Pluton","Shale","Alluvium","Amphibolite","Andesite","Anhydrite","Argillite","Arkose","Basalt","Batholith","Bauxite","Breccia","Chert","Clay","Coal","Colluvium","Complex","Conglomerate","Dolerite","Dolomite","Gabbro","Gneiss","Granite","Granodiorite","Graywacke","Gravel","Greenstone","Gypsum","Latite","Marble","Marl","Metadiabase","Migmatite","Monzonite","Mountains","Mudstone", "Limestone","Lm","Ls","Oolite","Ophiolite","Peat","Phosphorite","Phyllite","Pluton","Plutonic","Quartzite","Range","Rhyolite","Salt","Sand","Sands","Sandstone","SS","Sandstones","Schist","Serpentinite","Shale","Silt","Siltstone","Slate","Suite","Sui","Terrane","Till","Tonalite","Tuff","Unit","Volcanic","Volcanics")
