@@ -77,7 +77,7 @@ colnames(DF5)[2]<-"unit"
 Units1<-rbind(DF1,DF2,DF3,DF4,DF5)
 
 # Create a dictionary of common unit words
-ComUnitWords<-c("member","mbr","formation","fm","group","grp","supergroup","strata","stratum","sprGrp","spgrp","unit","complex","cmplx","cplx","ste","basement","pluton","shale","alluvium","amphibolite","andesite","anhydrite","argillite","arkose","basalt","batholith","bauxite","breccia","chert","clay","coal","colluvium","conglomerate","dolerite","dolomite","gabbro","gneiss","granite","granodiorite","graywacke","gravel","greenstone","gypsum","latite","marble","marl","metadiabase","migmatite","monzonite","mountain","mountains","mudstone", "limestone","lm","ls","oolite","ophiolite","peat","phosphorite","phyllite","pluton","plutonic","quartzite","range","rhyolite","salt","sand","sands","sandstone","sS","ss","sandstones","schist","serpentinite","shale","silt","siltstone","slate","suite","sui","terrane","till","tonalite","tuff","unit","volcanic","volcanics")# Make vector of upper case words and add it to the original vector
+ComUnitWords<-c("allochthon","bed","beds","member","mbr","formation","fm","group","grp","supergroup","strata","stratum","sprGrp","spgrp","sGp","unit","complex","cmplx","cplx","ste","basement","pluton","shale","alluvium","amphibolite","andesite","anhydrite","argillite","arkose","basalt","batholith","bauxite","breccia","chalk","chert","clay","coal","colluvium","conglomerate","diorite","dolerite","dolomite","gabbro","gneiss","gp","granite","granite,","granodiorite","graywacke","gravel","greenstone","gypsum","intrustion","latite","loess","marble","marl","metadacite","metadiabase","metagabbro","metagranite","metasediments","microdiorite","migmatite","monzonite","mountain","mountains","mudstone", "limestone","lm","ls","oolite","ophiolite","paleosol","peat","phosphorite","phyllite","pluton","plutonic","quartzite","range","rhyolite","rhyolites","salt","sand","sands","sandstone","sS","ss","sandstones","schist","SCHIST","serpentinite","sequence","shale","silt","siltstone","slate","suite","sui","terrane","till","tills","tillite","tonalite","tuff","unit","volcanic","volcanics")
 # Make vector of upper case words and add it to the original vector
 ComUnitWords<-c(ComUnitWords,gsub("(^[[:alpha:]])", "\\U\\1", ComUnitWords, perl=TRUE))
 
@@ -89,16 +89,22 @@ for(Row in NumRows){
     SplitUnits[[Row]]<-strsplit((as.character(Units1[,"unit"][Row]))," ")
     }
   
+# Find matches of common unit words in SplitUnits list
+MatchWords<-vector("list",length=length(SplitUnits))
+ for(Element in 1:length(SplitUnits)){
+    MatchWords[[Element]]<-unlist(SplitUnits[[Element]])%in%ComUnitWords}
+
 # Remove common unit words from each element in list
 FilteredUnits<-vector("list",length=length(SplitUnits))
- for(Element in 1:length(SplitUnits)){
-    FilteredUnits[[Element]]<-unlist(SplitUnits[[Element]])%in%ComUnitWords}
+for(Element in 1:length(SplitUnits)){
+    FilteredUnits[[Element]]<-unlist(SplitUnits[[Element]])[which(MatchWords[[Element]]=="FALSE")]
+    }
 
+# Past filtered units back into single text strings
+UnitStrings<-sapply(FilteredUnits, function(x) paste (x,collapse=" "))
 
-
-
-
-
+# Add UnitStrings as column back into Units1 dataframe
+Units1[,"filtered_units"]<-UnitStrings
 
 
 
