@@ -114,7 +114,12 @@ MembersDictionary<-c("mbr","member","Mbr","Member","MEMBER")
 # Create a list of unique member names
 Members<-unique(DF2[,"unit"])
 # Duplicate the Mebers names so each word in MembersDictionary is paired with each name.
-DuplicatedMembers<-sapply(Members, function(x) paste(rep(Members[x],length(MembersDictionary)),MembersDictionary))
+DuplicatedMembers<-sapply(Members, function(x) paste(rep(x,length(MembersDictionary)),MembersDictionary))
+# Rotate matrix
+DuplicatedMembers<-t(DuplicatedMembers)
+# Add column of member names without suffix
+Members<-cbind(as.character(Members),DuplicatedMembers)
+
 
 # For the formation data frame:
 # First create a dictionary of abbreviations and formation titles
@@ -122,7 +127,12 @@ FormationsDictionary<-c("fm","Fm","formation","Formation","FORMATION")
 # Create a list of unique formation names
 Formations<-unique(DF3[,"unit"])
 # Duplicate the Formation names so each word in FormationsDictionary is paired with each name.
-DuplicatedFormations<-sapply(Formations, function(x) paste(rep(Formations[x],length(FormationsDictionary)),FormationsDictionary))
+DuplicatedFormations<-sapply(Formations, function(x) paste(rep(x,length(FormationsDictionary)),FormationsDictionary))
+# Rotate matrix
+DuplicatedFormations<-t(DuplicatedFormations)
+# Add column of formation names without suffix
+Formations<-cbind(as.character(Formations),DuplicatedFormations)
+
 
 # For the group data frame: 
 # First create a dictionary of abbreviations and group titles
@@ -130,7 +140,11 @@ GroupsDictionary<-c("gp","Gp","grp","GRP","group","Group","GROUP")
 # Create a list of unique group names 
 Groups<-unique(DF4[,"unit"])
 #Duplicate the group names so each word in GroupsDictionary is paired with each name 
-DuplicatedGroups<-sapply(Groups, function(x) paste(rep(Groups[x],length(GroupsDictionary)),GroupsDictionary))
+DuplicatedGroups<-sapply(Groups, function(x) paste(rep(x,length(GroupsDictionary)),GroupsDictionary))
+# Rotate matrix
+DuplicatedGroups<-t(DuplicatedGroups)
+# Add column of group names without suffix
+Groups<-cbind(as.character(Groups),DuplicatedGroups)
 
 # For the supergroup data frame:
 # First create a dictionary of abbreviations and supergroup titles
@@ -138,9 +152,11 @@ SupergroupsDictionary<-c("sprGrp","SprGrp","sprgrp","spgrp","SpGrp","spGrp","spg
 # Create a list of unique supergroup names 
 Supergroups<-unique(DF5[,"unit"])
 #Duplicate the supergroup names so each word in SupergroupsDictionary is paired with each name 
-DuplicatedSupergroups<-sapply(Supergroups, function(x) paste(rep(Supergroups[x],length(SupergroupsDictionary)),SupergroupsDictionary))
-
-
+DuplicatedSupergroups<-sapply(Supergroups, function(x) paste(rep(x,length(SupergroupsDictionary)),SupergroupsDictionary))
+# Rotate matrix
+DuplicatedSupergroups<-t(DuplicatedSupergroups)
+# Add column of supergroup names without suffix
+Supergroups<-cbind(as.character(Supergroups),DuplicatedSupergroups)
 
 
 
