@@ -7,18 +7,21 @@ library(RCurl)
 #Connet to PostgreSQL
 Driver <- dbDriver("PostgreSQL") # Establish database driver
 Connection <- dbConnect(Driver, dbname = "labuser", host = "localhost", port = 5432, user = "labuser")
+
 DeepDiveData1<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_4000")
 DeepDiveData2<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_5000")
 DeepDiveData3<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_6000")
 DeepDiveData4<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_7000")
 DeepDiveData5<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_8000")
 
+DeepDiveData<-rbind(DeepDiveData1,DeepDiveData2,DeepDiveData3,DeepDiveData4,DeepDiveData5)
+
 # Remove symbols 
-DeepDiveData1[,"words"]<-gsub("\\{|\\}","",DeepDiveData1[,"words"])
-DeepDiveData1[,"poses"]<-gsub("\\{|\\}","",DeepDiveData1[,"poses"])
+DeepDiveData[,"words"]<-gsub("\\{|\\}","",DeepDiveData[,"words"])
+DeepDiveData[,"poses"]<-gsub("\\{|\\}","",DeepDiveData[,"poses"])
 # Make a substitute for commas so they are counted correctly as elements for future functions
-DeepDiveData1[,"words"]<-gsub("\",\"","COMMASUB",DeepDiveData1[,"words"])
-DeepDiveData1[,"poses"]<-gsub("\",\"","COMMASUB",DeepDiveData1[,"poses"])
+DeepDiveData[,"words"]<-gsub("\",\"","COMMASUB",DeepDiveData[,"words"])
+DeepDiveData[,"poses"]<-gsub("\",\"","COMMASUB",DeepDiveData[,"poses"])
 
 # Download dictionary of unit names from Macrostrat Database
 UnitsURL<-paste("https://dev.macrostrat.org/api/units?project_id=1&format=csv")
@@ -106,9 +109,9 @@ UnitStrings<-sapply(FilteredUnits, function(x) paste (x,collapse=" "))
 # Add UnitStrings as column back into Units1 dataframe
 Units1[,"filtered_units"]<-UnitStrings
 
-# Create member, formation, group, and supergroup dataframes
+# Create member, formation, group, and supergroup matrices
 
-# For the member dataframe:
+# For the member matrix:
 # First create a dictionary of abbreviations and member titles
 MembersDictionary<-c("mbr","member","Mbr","Member","MEMBER")
 # Create a list of unique member names
@@ -121,7 +124,7 @@ DuplicatedMembers<-t(DuplicatedMembers)
 Members<-cbind(as.character(Members),DuplicatedMembers)
 
 
-# For the formation data frame:
+# For the formation matrix:
 # First create a dictionary of abbreviations and formation titles
 FormationsDictionary<-c("fm","Fm","formation","Formation","FORMATION")
 # Create a list of unique formation names
@@ -134,7 +137,7 @@ DuplicatedFormations<-t(DuplicatedFormations)
 Formations<-cbind(as.character(Formations),DuplicatedFormations)
 
 
-# For the group data frame: 
+# For the group matrix: 
 # First create a dictionary of abbreviations and group titles
 GroupsDictionary<-c("gp","Gp","grp","GRP","group","Group","GROUP")
 # Create a list of unique group names 
@@ -146,7 +149,7 @@ DuplicatedGroups<-t(DuplicatedGroups)
 # Add column of group names without suffix
 Groups<-cbind(as.character(Groups),DuplicatedGroups)
 
-# For the supergroup data frame:
+# For the supergroup matrix:
 # First create a dictionary of abbreviations and supergroup titles
 SupergroupsDictionary<-c("sprGrp","SprGrp","sprgrp","spgrp","SpGrp","spGrp","spgp","sGp","SGp","supergroup","Supergroup","SuperGroup")
 # Create a list of unique supergroup names 
@@ -158,32 +161,134 @@ DuplicatedSupergroups<-t(DuplicatedSupergroups)
 # Add column of supergroup names without suffix
 Supergroups<-cbind(as.character(Supergroups),DuplicatedSupergroups)
 
+# Search unit names WITH suffixes
 
+# Find poses 
+findPoses<-function(DocRow,Dictionary) {
+    SplitPoses<-unlist(strsplit(DocRow["poses"],","))
+    SplitWords<-unlist(strsplit(DocRow["words"],","))
+  	FoundWords<-SplitWords%in%FirstDictionary
+  	
+  	# Create columns for final matrix
+  	MatchedWord<-SplitWords[which(FoundWords)]
+  	WordPosition<-which(FoundWords)
+  	Pose<-SplitPoses[which(FoundWords)]
+    DocumentID<-rep(DocRow["docid"],length(MatchedWord))
+    SentenceID<-rep(DocRow["sentid"],length(MatchedWord))
 
+    # Return the function output
+    return(cbind(MatchedWord,WordPosition,Pose,DocumentID,SentenceID))
+    }
+  	
+# Apply function to DeepDiveData documents
+DDResults<-pbapply(DeepDiveData,1,findPoses,c(Members[,1],Formatons[,1],Groups[,1],Supergroups[,1]))
 
+##################################### Organize into Data Frame #########################################
 
+# Create matrix of DDResults
+DDResultsMatrix<-do.call(rbind,DDResults)
+rownames(DDResultsMatrix)<-1:dim(DDResultsMatrix)[1]
+DDResultsFrame<-as.data.frame(DDResultsMatrix)
 
+# Ensure all columns are in correct format
+DDResultsFrame[,"MatchedWord"]<-as.character(DDResultsFrame[,"MatchedWord"])
+DDResultsFrame[,"WordPosition"]<-as.numeric(as.character(DDResultsFrame[,"WordPosition"]))
+DDResultsFrame[,"Pose"]<-as.character(DDResultsFrame[,"Pose"])
+DDResultsFrame[,"DocumentID"]<-as.character(DDResultsFrame[,"DocumentID"])
+DDResultsFrame[,"SentenceID"]<-as.numeric(as.character(DDResultsFrame[,"SentenceID"]))
 
+#################################### Isolate NNPs ############################################# 
 
+# Subset so you only get NNP matches
+DDResultsFrame<-subset(DDResultsFrame,DDResultsFrame[,3]=="NNP")
 
+####################### Find NNps adjacent to DDResultsFrame Matches ##########################
 
+# Pair document ID and sentence ID data for DeepDiveData
+doc.sent<-paste(DeepDiveData[,"docid"],DeepDiveData[,"sentid"],sep=".")
+# Make paired document and sentence data the row names for DeepDiveData
+rownames(DeepDiveData)<-doc.sent
+# Pair document ID and sentence ID data for 
+docID.sentID<-paste(DDResultsFrame[,"DocumentID"],DDResultsFrame[,"SentenceID"],sep=".")
+# Make a new column for paired document and sentence data in DDResultsFrame
+DDResultsFrame[,"doc.sent"]=docID.sentID
 
+# Create a subset of DeepDiveData that only contains data for document sentence pairs from DDResultsFrame
+DDMatches<-DeepDiveData[unique(DDResultsFrame[,"doc.sent"]),]
 
+# Make function to find NNP words in DDMatches
+findNNPs<-function(Sentence) {
+    SplitPoses<-unlist(strsplit(Sentence["poses"],","))
+    SplitSentences<-unlist(strsplit(Sentence["words"],","))
+    NNPs<-which(SplitPoses=="NNP")
+    NNPWords<-SplitSentences[NNPs]
+    return(cbind(NNPs,NNPWords))
+    }
+    
+# Apply findNNPs function to DDMatches
+NNPResults<-pbapply(DDMatches,1,findNNPs)
 
+# Create matrix of NNPResults
+NNPResultsMatrix<-do.call(rbind,NNPResults)
+rownames(NNPResultsMatrix)<-1:dim(NNPResultsMatrix)[1]
 
-# Create another dataframe of all combinations of unit names 
+# Add sentence ID data to NNPResultsMatrix
+# Find the number of NNP matches for each sentence
+MatchCount<-sapply(NNPResults,nrow)
+# Create a column for NNPResultsMatrix for sentence IDs
+NNPResultsMatrix<-cbind(NNPResultsMatrix,rep(names(NNPResults),times=MatchCount))
+# Name the column
+colnames(NNPResultsMatrix)[3]<-"SentID"
 
+# Convert matrix into data frame to hold different types of data
+NNPResultsFrame<-as.data.frame(NNPResultsMatrix)
 
-<-c("allochthon","bentonite","member","mbr","formation","fm","group","grp","soil","supergroup","strata","stratum","sprGrp","spgrp","sGp","unit","complex","cmplx","cplx","ste","basement","pluton","shale","alluvium","amphibolite","andesite","anhydrite","argillite","arkose","basalt","batholith","bauxite","breccia","chalk","chert","clay","coal","colluvium","conglomerate","diorite","dolerite","dolomite","gabbro","gneiss","gp","granite","granite,","granodiorite","graywacke","gravel","greenstone","gypsum","intrustion","latite","loess","marble","marl","metadacite","metadiabase","metagabbro","metagranite","metasediments","microdiorite","migmatite","monzonite","mountain","mountains","mudstone", "limestone","lm","ls","oolite","ophiolite","paleosol","peat","phosphorite","phyllite","pluton","plutonic","quartzite","range","rhyolite","rhyolites","salt","sand","sands","sandstone","sS","ss","sandstones","schist","SCHIST","serpentinite","sequence","shale","silt","siltstone","slate","suite","sui","terrane","till","tills","tillite","tonalite","tuff","unit","volcanic","volcanics")
+# Make sure data in columns are in the correct format
+NNPResultsFrame[,"NNPs"]<-as.numeric(as.character(NNPResultsFrame[,"NNPs"]))
+NNPResultsFrame[,"NNPWords"]<-as.character(NNPResultsFrame[,"NNPWords"])
+NNPResultsFrame[,"SentID"]<-as.character(NNPResultsFrame[,"SentID"])
 
+##################################### Find Consecutive NNPs ######################################
 
+findConsecutive<-function(NNPPositions) {
+    Breaks<-c(0,which(diff(NNPPositions)!=1),length(NNPPositions))
+    ConsecutiveList<-lapply(seq(length(Breaks)-1),function(x) NNPPositions[(Breaks[x]+1):Breaks[x+1]])
+    return(ConsecutiveList)
+    }
 
+# Find consecutive NNPs for each SentID
+Consecutive<-tapply(NNPResultsFrame[,"NNPs"], NNPResultsFrame[,"SentID"],findConsecutive)
+# Collapse the consecutive NNP clusters into single character strings
+ConsecutiveNNPs<-sapply(Consecutive,function(y) sapply(y,function(x) paste(x,collapse=",")))
 
+######################### Find Words Associated with Conescutive NNPs ###########################
 
+# Create a matrix with a row for each NNP cluster
+# Make a column for sentence IDs
+ClusterCount<-sapply(ConsecutiveNNPs,length)
+SentID<-rep(names(ConsecutiveNNPs),times=ClusterCount)
+# Make a column for cluster elements 
+ClusterPosition<-unlist(ConsecutiveNNPs)
+names(ClusterPosition)<-SentID
+# Make a column for the words associated with each NNP
+# Get numeric elements for each NNP
+NNPElements<-lapply(ClusterPosition,function(x) as.numeric(unlist(strsplit(x,","))))
+names(NNPElements)<-SentID
 
+NNPWords<-vector("character",length=length(NNPElements))
+for(Document in 1:length(NNPElements)){
+    ExtractElements<-NNPElements[[Document]]
+    DocumentName<-names(NNPElements)[Document]
+    SplitWords<-unlist(strsplit(DDMatches[DocumentName,"words"],","))
+    NNPWords[Document]<-paste(SplitWords[ExtractElements],collapse=" ")
+    }
 
-# Create a vector of all unique unit words
-UnitsVector<-c(as.character(UnitsFrame[,"unit_name"],UnitsFrame[,"Mbr"]),as.character(UnitsFrame[,"Fm"]),as.character(UnitsFrame[,"Gp"]),as.character(UnitsFrame[,"SGp"]))
-UnitsVector<-unique(UnitsVector)
-Units<-subset(UnitsVector,UnitsVector!="")
+# Bind columns into data frame 
+NNPClusterMatrix<-cbind(NNPWords,ClusterPosition,SentID)
+rownames(NNPClusterMatrix)<-NULL
+NNPClusterFrame<-as.data.frame(NNPClusterMatrix)
 
+# Make sure all of the columns are in the correct data format
+NNPClusterFrame[,"NNPWords"]<-as.character(NNPClusterFrame[,"NNPWords"])
+NNPClusterFrame[,"ClusterPosition"]<-as.character(NNPClusterFrame[,"ClusterPosition"])
+NNPClusterFrame[,"SentID"]<-as.character(NNPClusterFrame[,"SentID"])
