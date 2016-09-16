@@ -29,6 +29,38 @@ UnitsFrame<-read.csv(text=GotURL,header=TRUE)
 UnitsFrame<-UnitsFrame[!(UnitsFrame$unit_name=="Unnamed"),]
 UnitsFrame<-UnitsFrame[!(UnitsFrame$unit_name=="unnamed"),]
 
+# Extract columns from UnitsFrame to make a dataframe of macrostrat unit names and untitIDs
+GoodCols<-c("unit_id","unit_name","Mbr","Fm","Gp","SGp")
+V1<-UnitsFrame[,(names(UnitsFrame)%in%GoodCols)]
+
+# Create a 2 column dataframes of unit names and unit id #s, member names and unit id #s, formation names and unit id #s, group names and unit id #s, and supergroup names and unit id #s
+# For unit names and unit id #s:
+GoodCols<-c("unit_id","unit_name")
+DF1<-V1[,(names(V1)%in%GoodCols)]
+# For member names and unit id #s:
+GoodCols<-c("unit_id","Mbr")
+DF2<-V1[,(names(V1)%in%GoodCols)]
+# For formation names and unit id #s:
+GoodCols<-c("unit_id","Fm")
+DF3<-V1[,(names(V1)%in%GoodCols)]
+# For group names and unit id #s
+GoodCols<-c("unit_id","Gp")
+DF4<-V1[,(names(V1)%in%GoodCols)]
+# For supergroup names and unit id #s
+GoodCols<-c("unit_id","SGp")
+DF5<-V1[,(names(V1)%in%GoodCols)]
+
+# Stitch DF1, DF2, DF3, DF4, and DF5 into single dataframe
+
+
+# Remove unnecessary columns from UnitsFrame
+BadCols<-c("project_id","col_area","pbdb_occurrences","pbdb_collections")
+UnitsFrame<-UnitsFrame[,!(names(UnitsFrame)%in%BadCols)]
+
+
+
+
+
 
 
 
