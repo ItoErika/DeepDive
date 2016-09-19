@@ -8,16 +8,7 @@ library(RCurl)
 Driver <- dbDriver("PostgreSQL") # Establish database driver
 Connection <- dbConnect(Driver, dbname = "labuser", host = "localhost", port = 5432, user = "labuser")
 
-DeepDiveData1<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_1000")
-DeepDiveData2<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_2000")
-DeepDiveData3<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_3000")
-DeepDiveData4<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_4000")
-DeepDiveData5<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_5000")
-DeepDiveData6<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_6000")
-DeepDiveData7<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_7000")
-DeepDiveData8<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_8000")
-
-DeepDiveData<-rbind(DeepDiveData1,DeepDiveData2,DeepDiveData3,DeepDiveData4,DeepDiveData5,DeepDiveData6,DeepDiveData7,DeepDiveData8)
+DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_master")
 
 # Remove symbols 
 DeepDiveData[,"words"]<-gsub("\\{|\\}","",DeepDiveData[,"words"])
