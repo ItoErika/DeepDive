@@ -17,9 +17,9 @@ searchWords<-function(Sentence,Dictionary) {
     # Split sentences into individual words by separating sentences at each comma, and unlisting them
     SplitWords<-unlist(strsplit(Sentence["words"],","))
         # Find Dictionary words which appear in split words of nlp processed sentences
-  	    FoundWords<-SplitWords%in%Dictionary
-  # Have function return Dictionary matches
-  return(FoundWords)
+        FoundWords<-SplitWords%in%Dictionary
+    # Have function return Dictionary matches
+    return(FoundWords)
     }
 
 # Apply function to SentencesData 
