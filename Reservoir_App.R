@@ -253,13 +253,13 @@ findConsecutive<-function(NNPPositions) {
 # Find consecutive NNPs for each SentID
 Consecutive<-tapply(NNPResultsFrame[,"NNPs"], NNPResultsFrame[,"SentID"],findConsecutive)
 # Collapse the consecutive NNP clusters into single character strings
-ConsecutiveNNPs<-sapply(Consecutive,function(y) sapply(y,function(x) paste(x,collapse=",")))
+ConsecutiveNNPs<-pbsapply(Consecutive,function(y) sapply(y,function(x) paste(x,collapse=",")))
 
 ######################### Find Words Associated with Conescutive NNPs ###########################
 
 # Create a matrix with a row for each NNP cluster
 # Make a column for sentence IDs
-ClusterCount<-sapply(ConsecutiveNNPs,length)
+ClusterCount<-pbsapply(ConsecutiveNNPs,length)
 SentID<-rep(names(ConsecutiveNNPs),times=ClusterCount)
 # Make a column for cluster elements 
 ClusterPosition<-unlist(ConsecutiveNNPs)
@@ -268,6 +268,13 @@ names(ClusterPosition)<-SentID
 # Get numeric elements for each NNP
 NNPElements<-lapply(ClusterPosition,function(x) as.numeric(unlist(strsplit(x,","))))
 names(NNPElements)<-SentID
+
+findCluster<-function(NNPElements,DDMatches) {
+    ExtractElements<-unlist(NNPElements)
+    DocumentName<-names(NNPElements)
+    Words<-unlist(strsplit(DDMatches[DocumentName,"words"],","))
+    return(paste(SplitWords[ExtractElements],collapse=" "))
+    }
 
 NNPWords<-vector("character",length=length(NNPElements))
 for(Document in 1:length(NNPElements)){
