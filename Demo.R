@@ -26,3 +26,7 @@ searchWords<-function(Sentence,Dictionary) {
 # Apply function to DeepDiveData 
 DDResults<-pbapply(DeepDiveData,1,searchWords,Dictionary)
 
+# Assign document IDs DDResults list
+names(DDResults)<-DeepDiveData[,"docid"]
+
+head(DDResults)
