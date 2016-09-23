@@ -1,6 +1,5 @@
 # Load Libraries
 library("RPostgreSQL")
-library(pbapply)
 
 # Connect to PostgreSQL
 # Load Data Table Into R 
@@ -24,7 +23,7 @@ searchWords<-function(Sentence,Dictionary) {
     }
 
 # Apply function to DeepDiveData 
-DDResults<-pbapply(DeepDiveData,1,searchWords,Dictionary)
+DDResults<-apply(DeepDiveData,1,searchWords,Dictionary)
 
 # Assign document IDs DDResults list
 names(DDResults)<-DeepDiveData[,"docid"]
