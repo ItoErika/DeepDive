@@ -7,6 +7,9 @@ Driver <- dbDriver("PostgreSQL") # Establish database driver
 Connection <- dbConnect(Driver, dbname = "labuser", host = "localhost", port = 5432, user = "labuser")
 DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM reservoir_data")
 
+# See the format of DeepDiveData
+DeepDiveData[5,c("docid","sentid","words","poses","dep_paths")]
+
 # Create a dictionary of words of interest 
 #Select words of interest
 Dictionary<-c("pyrite","glauconite","chert","apatite")
