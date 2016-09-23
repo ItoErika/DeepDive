@@ -269,20 +269,17 @@ names(ClusterPosition)<-SentID
 NNPElements<-lapply(ClusterPosition,function(x) as.numeric(unlist(strsplit(x,","))))
 names(NNPElements)<-SentID
 
-findCluster<-function(NNPElements,DDMatches) {
-    ExtractElements<-unlist(NNPElements)
-    DocumentName<-names(NNPElements)
-    Words<-unlist(strsplit(DDMatches[DocumentName,"words"],","))
-    return(paste(SplitWords[ExtractElements],collapse=" "))
-    }
 
 NNPWords<-vector("character",length=length(NNPElements))
+progbar<-txtProgressBar(min=0,max=length(NNPElements),style=3)
 for(Document in 1:length(NNPElements)){
     ExtractElements<-NNPElements[[Document]]
     DocumentName<-names(NNPElements)[Document]
     SplitWords<-unlist(strsplit(DDMatches[DocumentName,"words"],","))
     NNPWords[Document]<-paste(SplitWords[ExtractElements],collapse=" ")
+    setTxtProgressBar(progbar,Document)
     }
+close(progbar)
 
 # Bind columns into data frame 
 NNPClusterMatrix<-cbind(NNPWords,ClusterPosition,SentID)
