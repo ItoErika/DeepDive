@@ -1,17 +1,18 @@
 # Load Libraries
 library("RPostgreSQL")
+library(pbapply)
 
 # Connect to PostgreSQL
 # Load Data Table Into R 
 Driver <- dbDriver("PostgreSQL") # Establish database driver
 Connection <- dbConnect(Driver, dbname = "labuser", host = "localhost", port = 5432, user = "labuser")
-SentencesData<-dbGetQuery(Connection,"SELECT * FROM pyrite_example_data")
+DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM reservoir_data")
 
 # Create a dictionary of words of interest 
 #Select words of interest
 Dictionary<-c("pyrite","glauconite","chert","apatite")
 
-# Write a function to search for words of interest in SentencesData
+# Write a function to search for words of interest in DeepDiveData
 
 searchWords<-function(Sentence,Dictionary) {
     # Split sentences into individual words by separating sentences at each comma, and unlisting them
@@ -22,6 +23,6 @@ searchWords<-function(Sentence,Dictionary) {
     return(FoundWords)
     }
 
-# Apply function to SentencesData 
-DDResults<-pbapply(SentencesData,1,searchWords,Dictionary)
+# Apply function to DeepDiveData 
+DDResults<-pbapply(DeepDiveData,1,searchWords,Dictionary)
 
