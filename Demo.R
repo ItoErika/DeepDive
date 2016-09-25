@@ -5,7 +5,7 @@ library("RPostgreSQL")
 # Load Data Table Into R 
 Driver <- dbDriver("PostgreSQL") # Establish database driver
 Connection <- dbConnect(Driver, dbname = "labuser", host = "localhost", port = 5432, user = "labuser")
-DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM reservoir_data")
+DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM test_data")
 
 # See the format of DeepDiveData
 DeepDiveData[5,c("docid","sentid","words","poses","dep_paths")]
