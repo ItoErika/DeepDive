@@ -294,7 +294,7 @@ NNPClusterFrame[,"SentID"]<-as.character(NNPClusterFrame[,"SentID"])
 
 # Find NNPClusterFrame rows in which unit names appear
 
-# Bind all member, formation, group, and supergroup names into a single matrix
+# Combine all member, formation, group, and supergroup names into a single vector
 AllUnitsDictionary<-c(unlist(Members),unlist(Formations),unlist(Groups),unlist(Supergroups))
 # Find matches of AllUnitsDictionary in the NNPClusterFrame "NNPWords" column
 MatchRows<-which(NNPClusterFrame[,"NNPWords"]%in%AllUnitsDictionary)
