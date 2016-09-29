@@ -301,8 +301,11 @@ MatchRows<-which(NNPClusterFrame[,"NNPWords"]%in%AllUnitsDictionary)
 
 # Subset the NNPClusterFrame so that only CompleteMatchRows are shown
 MatchFrame1<-data.frame(matrix(NA,ncol = 3, nrow = length(MatchRows)),stringsAsFactors=False)
+progbar<-txtProgressBar(min=0,max=length(MatchRows),style=3)
 for (Row in 1:length(MatchRows)){
     MatchFrame1[Row,]<-NNPClusterFrame[as.numeric(MatchRows[Row]),]
+    setTxtProgressBar(progbar,Row)
     }
+    close(progbar)
 # Create column names for MatchFrame1 to match NNPClusterMatrix
 colnames(MatchFrame1)<-colnames(NNPClusterFrame)
