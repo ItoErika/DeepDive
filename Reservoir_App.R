@@ -25,7 +25,7 @@ UnitsFrame<-read.csv(text=GotURL,header=TRUE)
 #Extract a dictionary of long strat names from UnitsFrame
 UnitDictionary<-UnitsFrame[,"strat_name_long"]
 # Add spaces to the front and back
-UnitDictionary<-pbsapply(UnitDictionary,function(x) paste(" ",x," ",collapse=""))
+# UnitDictionary<-pbsapply(UnitDictionary,function(x) paste(" ",x," ",collapse=""))
 
 # Create a function to that will search for unit names in DeepDiveData documents
 findGrep<-function(Dictionary,CleanedWords) {
@@ -38,22 +38,27 @@ findGrep<-function(Dictionary,CleanedWords) {
         }
     }
 
+# Establish a cluster for doParallel
+# Make Core Cluster
+# Cluster<-makeCluster(4)
+# Pass the functions to the cluster
+#clusterExport(cl=Cluster,varlist="findGrep")
+    
 # Search for unit names in DeepDiveData documents
 findUnits<-function(Document,Dictionary) {
-    Start<-Sys.time()
     CleanedWords<-gsub(","," ",Document["words"]) 
-    # Make Core Cluster
-    Cluster<-makeCluster(6)
-    # Pass the functions to the cluster
-    clusterExport(cl=Cluster,varlist="findGrep")
-    UnitHits<-parSapply(Cluster,Dictionary,findGrep,CleanedWords)
-    stopCluster(Cluster)
-    print(Sys.time()-Start)
+    # UnitHits<-parSapply(Cluster,Dictionary,findGrep,CleanedWords)
+    UnitHits<-sapply(Dictionary,findGrep,CleanedWords)
     return(UnitHits)
     }
 
 # Apply function to DeepDiveData documents
-UnitHits<-by(DeepDiveData,DeepDiveData,findUnits,UnitDictionary)
+Start<-print(Sys.time())
+UnitHits<-by(DeepDiveData,DeepDiveData[,"docid"],findUnits,UnitDictionary)
+End<-print(Start-Sys.time())
+
+# Stop the cluster
+#stopCluster(Cluster)
     
 
 
