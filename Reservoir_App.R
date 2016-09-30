@@ -1,8 +1,8 @@
 # Load Libraries
 library("RPostgreSQL")
 library("doParallel")
-library(pbapply)
-library(RCurl)
+library("pbapply")
+library("RCurl")
 
 #Connet to PostgreSQL
 Driver <- dbDriver("PostgreSQL") # Establish database driver
@@ -17,27 +17,63 @@ DeepDiveData[,"poses"]<-gsub("\\{|\\}","",DeepDiveData[,"poses"])
 DeepDiveData[,"words"]<-gsub("\",\"","COMMASUB",DeepDiveData[,"words"])
 DeepDiveData[,"poses"]<-gsub("\",\"","COMMASUB",DeepDiveData[,"poses"])
 
-# Search unit names WITH suffixes
+# Download dictionary of unit names from Macrostrat Database
+UnitsURL<-paste("https://dev.macrostrat.org/api/defs/strat_names?all&format=csv")
+GotURL<-getURL(UnitsURL)
+UnitsFrame<-read.csv(text=GotURL,header=TRUE)
 
-# Find poses 
-findPoses<-function(DocRow,Dictionary) {
-    SplitPoses<-unlist(strsplit(DocRow["poses"],","))
-    SplitWords<-unlist(strsplit(DocRow["words"],","))
-  	FoundWords<-SplitWords%in%Dictionary
-  	
-  	# Create columns for final matrix
-  	MatchedWord<-SplitWords[which(FoundWords)]
-  	WordPosition<-which(FoundWords)
-  	Pose<-SplitPoses[which(FoundWords)]
-    DocumentID<-rep(DocRow["docid"],length(MatchedWord))
-    SentenceID<-rep(DocRow["sentid"],length(MatchedWord))
+#Extract a dictionary of long strat names from UnitsFrame
+UnitDictionary<-UnitsFrame[,"strat_name_long"]
+# Add spaces to the front and back
+UnitDictionary<-pbsapply(UnitDictionary,function(x) paste(" ",x," ",collapse=""))
 
-    # Return the function output
-    return(cbind(MatchedWord,WordPosition,Pose,DocumentID,SentenceID))
+# Create a function to that will search for unit names in DeepDiveData documents
+findGrep<-function(Dictionary,CleanedWords) {
+    # Make sure grep function is case sensitive
+    if (length(grep(Dictionary,CleanedWords,ignore.case=TRUE))>0) {
+        return(as.character(Dictionary))
+        }
+    else {
+        return(NA)
+        }
     }
-  	
+
+# Search for unit names in DeepDiveData documents
+findUnits<-function(Document,Dictionary) {
+    Start<-Sys.time()
+    CleanedWords<-gsub(","," ",Document["words"]) 
+    # Make Core Cluster
+    Cluster<-makeCluster(6)
+    # Pass the functions to the cluster
+    clusterExport(cl=Cluster,varlist="findGrep")
+    UnitHits<-parSapply(Cluster,Dictionary,findGrep,CleanedWords)
+    stopCluster(Cluster)
+    print(Sys.time()-Start)
+    return(UnitHits)
+    }
+
 # Apply function to DeepDiveData documents
-DDResults<-pbapply(DeepDiveData,1,findPoses,c(Members[,1],Formations[,1],Groups[,1],Supergroups[,1]))
+UnitHits<-by(DeepDiveData,DeepDiveData,findUnits,UnitDictionary)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##################################### Organize into Data Frame #########################################
 
@@ -171,3 +207,38 @@ for (Row in 1:length(MatchRows)){
     close(progbar)
 # Create column names for MatchFrame1 to match NNPClusterMatrix
 colnames(MatchFrame1)<-colnames(NNPClusterFrame)
+    
+    
+    
+    # Find poses 
+findPoses<-function(Document,Dictionary=SplitUnits) {
+    SplitPoses<-unlist(strsplit(DocRow["poses"],","))
+    SplitWords<-unlist(strsplit(DocRow[,"words"],","))
+  	
+    
+    for(Unit in length(SplitUnits)){
+           FoundWords<-SplitWords%in%SplitUnits
+        
+    FoundWords<-SplitWords%in%Dictionary
+  	
+  	# Create columns for final matrix
+  	MatchedWord<-SplitWords[which(FoundWords)]
+  	WordPosition<-which(FoundWords)
+  	Pose<-SplitPoses[which(FoundWords)]
+    DocumentID<-rep(DocRow["docid"],length(MatchedWord))
+    SentenceID<-rep(DocRow["sentid"],length(MatchedWord))
+
+    # Return the function output
+    return(cbind(MatchedWord,WordPosition,Pose,DocumentID,SentenceID))
+    }
+  	
+# Apply function to DeepDiveData documents
+DDResults<-pbapply(DeepDiveData[50000:100000,],1,findPoses,UnitDictionary)
+    
+by(DeepDiveData,DeepDiveData[,"docid"],)
+    
+      	# Create columns for final matrix
+    MatchedUnit<-
+    DocumentID<-rep(DocRow["docid"],length(MatchedWord))
+    SentenceID<-rep(DocRow["sentid"],length(MatchedWord))
+
