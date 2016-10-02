@@ -6,8 +6,11 @@ StratNamesURL<-paste("https://macrostrat.org/api/defs/strat_names?all&format=csv
 GotURL<-getURL(StratNamesURL)
 StratNamesFrame<-read.csv(text=GotURL,header=TRUE)
 
-unit_id, col_id, lat, lng, unit_name, strat_name_long
-
 Units<-merge(x = StratNamesFrame, y = UnitsFrame, by = "strat_name_id", all.x = TRUE)
 
-Units<-cbind(Units[,"strat_name_id"],Units[,"strat_name_long"],Units[,"unit_id"],Units[,"unit_name"],Units[,"col_id"])
+unit_id, col_id, lat, lng, unit_name, strat_name_long
+
+GoodCols<-c("strat_name_id","strat_name_long","unit_id","unit_name","col_id")
+Units<-Units[,(names(Units)%in%GoodCols)]
+
+
