@@ -10,7 +10,7 @@ Units<-merge(x = StratNamesFrame, y = UnitsFrame, by = "strat_name_id", all.x = 
 
 unit_id, col_id, lat, lng, unit_name, strat_name_long
 
-GoodCols<-c("strat_name_id","strat_name_long","unit_id","unit_name","col_id")
+GoodCols<-c("strat_name_id","strat_name_long","strat_name","unit_id","unit_name","col_id")
 Units<-Units[,(names(Units)%in%GoodCols)]
 
 
