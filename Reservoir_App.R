@@ -48,10 +48,30 @@ Units<-merge(x = StratNamesFrame, y = UnitsFrame, by = "strat_name_id", all.x = 
 
 # unit_id, col_id, lat, lng, unit_name, strat_name_long
 
-GoodCols<-c("strat_name_id","strat_name_long","strat_name","unit_id","unit_name","col_id")
-Units<-Units[,(names(Units)%in%GoodCols)]
-
+Units<-Units[,c("strat_name_id","strat_name_long","strat_name","unit_id","unit_name","col_id")]
+Units<-na.omit(Units)
 UnitDictionary<-as.character(unique(Units[,"strat_name_long"]))
+
+CleanedWords<-gsub(","," ",DeepDiveData[,"words"])
+
+Cluster<-makeCluster(4)
+
+Start<-print(Sys.time())
+UnitHits<-parSapply(Cluster,UnitDictionary,function(x,y) grep(x,y,ignore.case=FALSE),CleanedWords)
+End<-print(Sys.time())
+
+names(UnitHits)<-UnitDictionary
+
+
+
+
+
+
+
+
+
+
+
 DeepDiveData.dt<-data.table(DeepDiveData)
 
 # Create a function to that will search for unit names in DeepDiveData documents
