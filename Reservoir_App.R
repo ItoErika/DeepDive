@@ -3,12 +3,21 @@ library("RPostgreSQL")
 library("doParallel")
 library("pbapply")
 library("RCurl")
+library("data.table")
 
 #Connet to PostgreSQL
-Driver <- dbDriver("PostgreSQL") # Establish database driver
-Connection <- dbConnect(Driver, dbname = "labuser", host = "localhost", port = 5432, user = "labuser")
+#Driver <- dbDriver("PostgreSQL") # Establish database driver
+#Connection <- dbConnect(Driver, dbname = "labuser", host = "localhost", port = 5432, user = "labuser")
 
-DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_master")
+#DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_master")
+
+# Load DeepDiveData 
+DeepDiveData<- fread("aquifersentences_nlp352_master.csv")
+DeepDiveData.dt<-as.data.frame(DeepDiveData)
+
+# Extract columns of interest from DeepDiveData
+GoodCols<-c("docid","sentid","wordidx","words","poses","dep_parents")
+DeepDiveData<-DeepDiveData[,(names(DeepDiveData)%in%GoodCols)]
 
 # Remove symbols 
 DeepDiveData[,"words"]<-gsub("\\{|\\}","",DeepDiveData[,"words"])
@@ -40,25 +49,48 @@ findGrep<-function(Dictionary,CleanedWords) {
 
 # Establish a cluster for doParallel
 # Make Core Cluster
-# Cluster<-makeCluster(4)
+#Cluster<-makeCluster(4)
 # Pass the functions to the cluster
 #clusterExport(cl=Cluster,varlist="findGrep")
     
 # Search for unit names in DeepDiveData documents
 findUnits<-function(Document,Dictionary) {
     CleanedWords<-gsub(","," ",Document["words"]) 
-    # UnitHits<-parSapply(Cluster,Dictionary,findGrep,CleanedWords)
+    #UnitHits<-parSapply(Cluster,Dictionary,findGrep,CleanedWords)
     UnitHits<-sapply(Dictionary,findGrep,CleanedWords)
     return(UnitHits)
     }
 
 # Apply function to DeepDiveData documents
+# Start<-print(Sys.time())
+# UnitHits<-by(DeepDiveData,DeepDiveData[,"docid"],findUnits,UnitDictionary)
+# End<-print(Start-Sys.time())
+
+DeepDiveData.dt<-data.table(DeepDiveData[1:10000,])
+UnitHits<-DeepDiveData.dt[,sapply(.SD,findUnits,UnitDictionary),by="docid",.SDcols=c("docid","words")]
+
+# forloop
+
 Start<-print(Sys.time())
-UnitHits<-by(DeepDiveData,DeepDiveData[,"docid"],findUnits,UnitDictionary)
+hitUnits<-function(DeepDiveData,UnitDictionary) {
+        Documents<-unique(DeepDiveData[,"docid"])
+        FinalList<-vector("list",length=length(Documents))
+        progbar<-txtProgressBar(min=0,max=length(Documents),style=3)
+        for (Document in Documents) {
+            Subset<-subset(DeepDiveData,DeepDiveData[,"docid"]==Document)
+            FinalList[[Document]]<-findUnits(Subset,UnitDictionary)
+            setTxtProgressBar(progbar,Document)
+            }
+        close(progbar)
+        return(FinalList)
+        }
+
+# Run batch loop on all DeepDiveDocuments
+UnitHits<-hitUnits(DeepDiveData[1:10000,],UnitDictionary)
 End<-print(Start-Sys.time())
 
 # Stop the cluster
-#stopCluster(Cluster)
+stopCluster(Cluster)
     
 
 
