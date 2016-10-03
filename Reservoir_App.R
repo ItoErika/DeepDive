@@ -12,8 +12,8 @@ library("data.table")
 #DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_master")
 
 # Load DeepDiveData 
-DeepDiveData<- fread("aquifersentences_nlp352_master.csv")
-DeepDiveData.dt<-as.data.frame(DeepDiveData)
+DeepDiveData<- fread("~/Desktop/R/DeepDiveData.csv")
+DeepDiveData<-as.data.frame(DeepDiveData)
 
 # Extract columns of interest from DeepDiveData
 GoodCols<-c("docid","sentid","wordidx","words","poses","dep_parents")
@@ -27,25 +27,53 @@ DeepDiveData[,"words"]<-gsub("\",\"","COMMASUB",DeepDiveData[,"words"])
 DeepDiveData[,"poses"]<-gsub("\",\"","COMMASUB",DeepDiveData[,"poses"])
 
 # Download dictionary of unit names from Macrostrat Database
-UnitsURL<-paste("https://dev.macrostrat.org/api/defs/strat_names?all&format=csv")
-GotURL<-getURL(UnitsURL)
-UnitsFrame<-read.csv(text=GotURL,header=TRUE)
+# UnitsURL<-paste("https://dev.macrostrat.org/api/defs/strat_names?all&format=csv")
+# GotURL<-getURL(UnitsURL)
+# UnitsFrame<-read.csv(text=GotURL,header=TRUE)
 
 #Extract a dictionary of long strat names from UnitsFrame
-UnitDictionary<-UnitsFrame[,"strat_name_long"]
+# UnitDictionary<-UnitsFrame[,"strat_name_long"]
 # Add spaces to the front and back
 # UnitDictionary<-pbsapply(UnitDictionary,function(x) paste(" ",x," ",collapse=""))
 
+UnitsURL<-paste("https://macrostrat.org/api/units?project_id=1&format=csv")
+GotURL<-getURL(UnitsURL)
+UnitsFrame<-read.csv(text=GotURL,header=TRUE)
+
+StratNamesURL<-paste("https://macrostrat.org/api/defs/strat_names?all&format=csv")
+GotURL<-getURL(StratNamesURL)
+StratNamesFrame<-read.csv(text=GotURL,header=TRUE)
+
+Units<-merge(x = StratNamesFrame, y = UnitsFrame, by = "strat_name_id", all.x = TRUE)
+
+# unit_id, col_id, lat, lng, unit_name, strat_name_long
+
+GoodCols<-c("strat_name_id","strat_name_long","strat_name","unit_id","unit_name","col_id")
+Units<-Units[,(names(Units)%in%GoodCols)]
+
+UnitDictionary<-as.character(unique(Units[,"strat_name_long"]))
+DeepDiveData.dt<-data.table(DeepDiveData)
+
 # Create a function to that will search for unit names in DeepDiveData documents
-findGrep<-function(Dictionary,CleanedWords) {
-    # Make sure grep function is case sensitive
-    if (length(grep(Dictionary,CleanedWords,ignore.case=TRUE))>0) {
-        return(as.character(Dictionary))
-        }
-    else {
-        return(NA)
-        }
+findGrep<-function(Words,Dictionary) {
+    CleanedWords<-gsub(","," ",Words)
+    Match<-grep(Dictionary,CleanedWords,ignore.case=TRUE)
+    return(Match)    
     }
+
+findUnits<-function(DeepDiveData,Dictionary) {
+    FinalList<-vector("list",length=length(Dictionary))
+    names(FinalList)<-Dictionary
+    progbar<-txtProgressBar(min=0,max=length(Dictionary),style=3)
+    for (Unit in 1:length(Dictionary)) {
+        FinalList[[Unit]]<-DeepDiveData[,sapply(.SD,findGrep,Dictionary[Unit]),by="docid",.SDcols="words"]
+        setTxtProgressBar(progbar,Unit)
+        }
+    close(progbar)
+    return(FinalList)
+    }
+ 
+UnitHits<-findUnits(DeepDiveData.dt,UnitDictionary)
 
 # Establish a cluster for doParallel
 # Make Core Cluster
@@ -66,31 +94,31 @@ findUnits<-function(Document,Dictionary) {
 # UnitHits<-by(DeepDiveData,DeepDiveData[,"docid"],findUnits,UnitDictionary)
 # End<-print(Start-Sys.time())
 
-DeepDiveData.dt<-data.table(DeepDiveData[1:10000,])
+DeepDiveData.dt<-data.table(DeepDiveData[1:6000,])
 UnitHits<-DeepDiveData.dt[,sapply(.SD,findUnits,UnitDictionary),by="docid",.SDcols=c("docid","words")]
 
 # forloop
 
-Start<-print(Sys.time())
-hitUnits<-function(DeepDiveData,UnitDictionary) {
-        Documents<-unique(DeepDiveData[,"docid"])
-        FinalList<-vector("list",length=length(Documents))
-        progbar<-txtProgressBar(min=0,max=length(Documents),style=3)
-        for (Document in Documents) {
-            Subset<-subset(DeepDiveData,DeepDiveData[,"docid"]==Document)
-            FinalList[[Document]]<-findUnits(Subset,UnitDictionary)
-            setTxtProgressBar(progbar,Document)
-            }
-        close(progbar)
-        return(FinalList)
-        }
+# Start<-print(Sys.time())
+# hitUnits<-function(DeepDiveData,UnitDictionary) {
+       #Documents<-unique(DeepDiveData[,"docid"])
+       #FinalList<-vector("list",length=length(Documents))
+       #progbar<-txtProgressBar(min=0,max=length(Documents),style=3)
+       #for (Document in Documents) {
+           #Subset<-subset(DeepDiveData,DeepDiveData[,"docid"]==Document)
+           #FinalList[[Document]]<-findUnits(Subset,UnitDictionary)
+           #setTxtProgressBar(progbar,Document)
+           #}
+       #close(progbar)
+       #return(FinalList)
+       #}
 
 # Run batch loop on all DeepDiveDocuments
-UnitHits<-hitUnits(DeepDiveData[1:10000,],UnitDictionary)
-End<-print(Start-Sys.time())
+# UnitHits<-hitUnits(DeepDiveData[1:500,],UnitDictionary)
+# End<-print(Start-Sys.time())
 
 # Stop the cluster
-stopCluster(Cluster)
+# stopCluster(Cluster)
     
 
 
