@@ -36,19 +36,27 @@ DeepDiveData[,"poses"]<-gsub("\",\"","COMMASUB",DeepDiveData[,"poses"])
 # Add spaces to the front and back
 # UnitDictionary<-pbsapply(UnitDictionary,function(x) paste(" ",x," ",collapse=""))
 
-UnitsURL<-paste("https://macrostrat.org/api/units?project_id=1&format=csv")
+UnitsURL<-paste("https://dev.macrostrat.org/api/units?project_id=1&format=csv&response=long")
 GotURL<-getURL(UnitsURL)
 UnitsFrame<-read.csv(text=GotURL,header=TRUE)
 
-StratNamesURL<-paste("https://macrostrat.org/api/defs/strat_names?all&format=csv")
+StratNamesURL<-paste("https://dev.macrostrat.org/api/defs/strat_names?all&format=csv")
 GotURL<-getURL(StratNamesURL)
 StratNamesFrame<-read.csv(text=GotURL,header=TRUE)
+
+# Get rid of columns from UnitsFrame that are also in StratNamesFrame so the merge function can run smoothly EXCEPT "strat_name_id"
+UnitsFrameNoOverlap<-UnitsFrame[,!(names(UnitsFrame) %in% names(StratNamesFrame))]
+UnitsFrame<-UnitsFrame[,c(colnames(UnitsFrameNoOverlap),"strat_name_id")]
 
 Units<-merge(x = StratNamesFrame, y = UnitsFrame, by = "strat_name_id", all.x = TRUE)
 
 # unit_id, col_id, lat, lng, unit_name, strat_name_long
 
-Units<-Units[,c("strat_name_id","strat_name_long","strat_name","unit_id","unit_name","col_id")]
+Units<-Units[,c("strat_name_id","strat_name_long","strat_name","unit_id","unit_name","col_id","t_age","b_age","max_thick","min_thick","lith")]
+
+# Add a column of mean thickness
+Units$mean_thick<-apply(Units,1,function(row) mean(row["max_thick"]:row["min_thick"]))
+
 Units<-na.omit(Units)
 UnitDictionary<-as.character(unique(Units[,"strat_name_long"]))
 
@@ -61,16 +69,61 @@ UnitHits<-parSapply(Cluster,UnitDictionary,function(x,y) grep(x,y,ignore.case=FA
 End<-print(Sys.time())
 
 names(UnitHits)<-UnitDictionary
+    
+# Locate documents in which matches occurred for each respective strat_name_long
+
+# Unlist the row location data for each element(unit) in UnitHits
+MatchRowList<-lapply(UnitHits,function(x) unlist(x))
+# Extract docid data associated with each row in MatchRowList
+MatchDocList<-lapply(MatchRowList,function(x) DeepDiveData[x,"docid"])  
+    
+# Search documents in MatchDocList for abbreviated unit names of the full names for which they have hits
+
+Units[which(Units[,"strat_name_long"]==as.character(names(MatchDocList[1]))),]
+
+
+# Remove empty List elements
+NumHits<-pbsapply(MatchRowList,length) 
+UnitSentences<-MatchRowList[which(NumHits>0)]
+    
+Start<-print(Sys.time())
+AquiferMatches<-pbsapply(UnitSentences,function(x,y) grep("aquifer",y[x],ignore.case=TRUE),CleanedWords)
+End<-print(Sys.time())
+    
+AquiferHits<-pbsapply(AquiferMatches,length) 
+AquiferSentences<-AquiferMatches[which(AquiferHits>0)]
+    
+# Extract macrostrat data for each unit with aquifer hits
+    
+# Make a vector of aquifer names
+Aquifers<-names(AquiferSentences)
+    
+# Extract Aquifer data from Units dataframe by name
+AquiferUnits<-Units[which(Units[,"strat_name_long"]%in%Aquifers),]
+
+
+
+
+    
 
 
 
 
 
-
-
-
-
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 DeepDiveData.dt<-data.table(DeepDiveData)
 
