@@ -84,6 +84,8 @@ End<-print(Sys.time())
 Start<-print(Sys.time())
 ShortUnitHits<-parSapply(Cluster,ShortUnitDictionary,function(x,y) grep(x,y,ignore.case=FALSE),CleanedWords)
 End<-print(Sys.time())
+    
+stopCluster(Cluster)
 
 # names(UnitHits)<-ShortUnitDictionary
     
