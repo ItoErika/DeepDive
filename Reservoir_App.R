@@ -12,7 +12,7 @@ library("data.table")
 #DeepDiveData<-dbGetQuery(Connection,"SELECT * FROM aquifersentences_nlp352_master")
 
 # Load DeepDiveData 
-DeepDiveData<- fread("~/Desktop/R/DeepDiveData.csv")
+DeepDiveData<- fread("~/Documents/DeepDive/Reservoir/R/DeepDiveData.csv")
 DeepDiveData<-as.data.frame(DeepDiveData)
 
 # Extract columns of interest from DeepDiveData
@@ -54,28 +54,64 @@ Units<-merge(x = StratNamesFrame, y = UnitsFrame, by = "strat_name_id", all.x = 
 
 Units<-Units[,c("strat_name_id","strat_name_long","strat_name","unit_id","unit_name","col_id","t_age","b_age","max_thick","min_thick","lith")]
 
+Units<-na.omit(Units)
+
 # Add a column of mean thickness
 Units$mean_thick<-apply(Units,1,function(row) mean(row["max_thick"]:row["min_thick"]))
+    
+# Make two dictionaries: one of long strat names and one of short strat names
 
-Units<-na.omit(Units)
-UnitDictionary<-as.character(unique(Units[,"strat_name_long"]))
+# make a matrix of long and short units only. 
+LongShortUnits<-Units[,c("strat_name_long","strat_name")]
+# remove duplicate rows
+LongShortUnits<-unique(LongShortUnits)
 
+# Create dictionaries
+LongUnitDictionary<-as.character(LongShortUnits[,"strat_name_long"])
+ShortUnitDictionary<-as.character(LongShortUnits[,"strat_name"])
+
+# Remove commas from DeepDiveData
 CleanedWords<-gsub(","," ",DeepDiveData[,"words"])
 
-Cluster<-makeCluster(4)
+Cluster<-makeCluster(6)
 
 Start<-print(Sys.time())
-UnitHits<-parSapply(Cluster,UnitDictionary,function(x,y) grep(x,y,ignore.case=FALSE),CleanedWords)
+LongUnitHits<-parSapply(Cluster,LongUnitDictionary,function(x,y) grep(x,y,ignore.case=FALSE),CleanedWords)
 End<-print(Sys.time())
 
-names(UnitHits)<-UnitDictionary
+# names(UnitHits)<-LongUnitDictionary
+    
+Start<-print(Sys.time())
+ShortUnitHits<-parSapply(Cluster,ShortUnitDictionary,function(x,y) grep(x,y,ignore.case=FALSE),CleanedWords)
+End<-print(Sys.time())
+
+# names(UnitHits)<-ShortUnitDictionary
+    
     
 # Locate documents in which matches occurred for each respective strat_name_long
 
-# Unlist the row location data for each element(unit) in UnitHits
-MatchRowList<-lapply(UnitHits,function(x) unlist(x))
+# Unlist the row location data for each element(unit) in LongUnitHits
+MatchRowList<-lapply(LongUnitHits,function(x) unlist(x))
 # Extract docid data associated with each row in MatchRowList
 MatchDocList<-lapply(MatchRowList,function(x) DeepDiveData[x,"docid"])  
+
+    
+# Note that this does not sub out spaces for commas, because we are doing a single word search    
+findPairs<-function(DeepDiveData,MatchDocList,ShortUnitHits,Word="aquifer") {
+    FinalVector<-vector("logical",length=length(MatchDocList))
+    names(FinalVector)<-names(MatchDocList)
+    progbar<-txtProgressBar(min=0,max=length(FinalVector),style=3)
+    for (i in 1:length(FinalVector)) {
+        Temp<-DeepDiveData[ShortUnitHits[[i]],] # May need to add an unlist() to ShortUnitHits
+        DocSubset<-subset(Temp,Temp[,"docid"]%in%MatchDocList[[i]]==TRUE)
+        FinalVector[i]<-length(grep(Word,DocSubset[,"words"],ignore.case=TRUE))
+        setTxtProgressBar(progbar,i)
+        }
+    close(progbar)
+    return(FinalVector)
+    }
+    
+Matches<-findPairs(DeepDiveData[,c("docid","words")],MatchDocList,ShortUnitHits,"aquifer")    
     
 # Search documents in MatchDocList for abbreviated unit names of the full names for which they have hits
 
