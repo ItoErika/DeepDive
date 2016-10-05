@@ -63,14 +63,14 @@ Units$mean_thick<-apply(Units,1,function(row) mean(row["max_thick"]:row["min_thi
 
 # make a matrix of long and short units only. 
 LongShortUnits<-Units[,c("strat_name_long","strat_name")]
-# remove duplicate rows
+# duplicate rows
 LongShortUnits<-unique(LongShortUnits)
 
 # Create dictionaries
 LongUnitDictionary<-as.character(LongShortUnits[,"strat_name_long"])
 ShortUnitDictionary<-as.character(LongShortUnits[,"strat_name"])
 
-# Remove commas from DeepDiveData
+# commas from DeepDiveData
 CleanedWords<-gsub(","," ",DeepDiveData[,"words"])
 
 Cluster<-makeCluster(6)
@@ -126,8 +126,38 @@ Start<-print(Sys.time())
 AquiferMatches<-pbsapply(UnitSentences,function(x,y) grep("aquifer",y[x],ignore.case=TRUE),CleanedWords)
 End<-print(Sys.time())
     
-AquiferHits<-pbsapply(AquiferMatches,length) 
+AquiferHits<-pbsapply(AquiferMatches,length)
+# Remove units with no hits 
+# AquiferHits<-AquiferHits[which(AquiferHits[names(AquiferHits)]!=0)]
 AquiferSentences<-AquiferMatches[which(AquiferHits>0)]
+    
+# Take a random sample of AquiferSentences to check accuracy
+# AquiferMatchList<-lapply(AquiferSentences,function(x) sample(unlist(x),1,replace=FALSE,prob=NULL))
+# AqSample<-sample(AquiferMatchlist,100,replace=FALSE,prob=NULL)
+# Create a data frame of matched sentences from the sample
+# SampleUnits<-names(AqSample)
+# SampleSentences<-UnitSentences[SampleUnits]
+# names(SampleSentences)<-names(AqSample)
+
+# AqSampRows<-vector(length=length(SampleSentences))
+# for (Unit in 1:length(SampleSentences)){
+    # AqSampSents[Unit]<-SampleSentences[[Unit]][as.numeric(ASample[Unit])]
+    # }
+
+# AqSampSents<-sapply(AqSampRows,function(x)CleanedWords[x])
+
+# SampleFrame<-data.frame(SampleUnits,AqSampRows,AqSampSents)
+
+# write.csv(SampleFrame,file="SampleFrame.csv",row.names=FALSE)
+
+
+
+    
+# SampleSentences<-sapply(SampleUnits, function(x) UnitSentences[[SampleUnits]])
+    
+    CleanedWords[unlist(UnitSentences[["Abo Formation"]])[185]]
+    
+
     
 # Extract macrostrat data for each unit with aquifer hits
     
