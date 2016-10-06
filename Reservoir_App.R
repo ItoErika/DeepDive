@@ -73,12 +73,29 @@ ShortUnitDictionary<-as.character(LongShortUnits[,"strat_name"])
 # commas from DeepDiveData
 CleanedWords<-gsub(","," ",DeepDiveData[,"words"])
 
-Cluster<-makeCluster(6)
+Cluster<-makeCluster(4)
 
 Start<-print(Sys.time())
 LongUnitHits<-parSapply(Cluster,LongUnitDictionary,function(x,y) grep(x,y,ignore.case=FALSE, perl = TRUE),CleanedWords)
 End<-print(Sys.time())
 
+# Create a matrix of unit hits locations with corresponding unit names
+LongUnitHitsLength<-pbsapply(LongUnitHits,length)
+LongUnitNames<-rep(names(LongUnitHits),times=LongUnitHitsLength)
+LongUnitLookUp<-cbind(LongUnitNames,unlist(LongUnitHits))
+# convert matrix to data frame
+LongUnitLookUp<-as.data.frame(LongUnitLookUp)
+# convert row match location (denotes location in CleanedWords) column to numerical data
+colnames(LongUnitLookUp)[2]<-"MatchLocation"
+LongUnitLookUp[,"MatchLocation"]<-as.numeric(as.character(LongUnitLookUp[,"MatchLocation"]))
+    
+AcceptableHits<-names(table(LongUnitLookUp))[which(table(LongUnitLookUp[,"MatchLocation"])==1)]
+LongHitTable<-subset(LongUnitLookUp,LongUnitLookUp[,"MatchLocation"]%in%AcceptableHits==TRUE)
+    
+# Remove MatchLocation rows which appear more than once (remove sentences in which more than one unit occurs)
+
+    
+    
 # names(UnitHits)<-LongUnitDictionary
     
 Start<-print(Sys.time())
