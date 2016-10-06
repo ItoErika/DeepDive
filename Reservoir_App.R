@@ -133,6 +133,14 @@ AquiferHits<-pbsapply(AquiferMatches,length)
 # AquiferHits<-AquiferHits[which(AquiferHits[names(AquiferHits)]!=0)]
 AquiferSentences<-AquiferMatches[which(AquiferHits>0)]
     
+# Extract macrostrat data for each unit with aquifer hits
+    
+# Make a vector of aquifer names
+Aquifers<-names(AquiferSentences)
+    
+# Extract Aquifer data from Units dataframe by name
+AquiferUnits<-Units[which(Units[,"strat_name_long"]%in%Aquifers),]
+    
 # Take a random sample of AquiferSentences to check accuracy
 # AquiferMatchList<-lapply(AquiferSentences,function(x) sample(unlist(x),1,replace=FALSE,prob=NULL))
 # AqSample<-sample(AquiferMatchlist,100,replace=FALSE,prob=NULL)
@@ -147,27 +155,10 @@ AquiferSentences<-AquiferMatches[which(AquiferHits>0)]
     # }
 
 # AqSampSents<-sapply(AqSampRows,function(x)CleanedWords[x])
-
 # SampleFrame<-data.frame(SampleUnits,AqSampRows,AqSampSents)
-
 # write.csv(SampleFrame,file="SampleFrame.csv",row.names=FALSE)
+  
 
-
-
-    
-# SampleSentences<-sapply(SampleUnits, function(x) UnitSentences[[SampleUnits]])
-    
-    CleanedWords[unlist(UnitSentences[["Abo Formation"]])[185]]
-    
-
-    
-# Extract macrostrat data for each unit with aquifer hits
-    
-# Make a vector of aquifer names
-Aquifers<-names(AquiferSentences)
-    
-# Extract Aquifer data from Units dataframe by name
-AquiferUnits<-Units[which(Units[,"strat_name_long"]%in%Aquifers),]
 
 
 
