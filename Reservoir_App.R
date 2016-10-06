@@ -105,7 +105,7 @@ findPairs<-function(DeepDiveData,MatchDocList,ShortUnitHits,Word="aquifer") {
     names(FinalVector)<-names(MatchDocList)
     progbar<-txtProgressBar(min=0,max=length(FinalVector),style=3)
     for (i in 1:length(FinalVector)) {
-        Temp<-DeepDiveData[ShortUnitHits[[i]],] # May need to add an unlist() to ShortUnitHits
+        Temp<-DeepDiveData[ShortUnitHits[[i]],]
         DocSubset<-subset(Temp,Temp[,"docid"]%in%MatchDocList[[i]]==TRUE)
         FinalVector[i]<-length(grep(Word,DocSubset[,"words"],ignore.case=TRUE))
         setTxtProgressBar(progbar,i)
@@ -134,6 +134,8 @@ AquiferHits<-pbsapply(AquiferMatches,length)
 # AquiferHits<-AquiferHits[which(AquiferHits[names(AquiferHits)]!=0)]
 AquiferSentences<-AquiferMatches[which(AquiferHits>0)]
     
+# SEE TEST1 in Reservoir_Tests page for accuracy test
+    
 # Extract macrostrat data for each unit with aquifer hits
     
 # Make a vector of aquifer names
@@ -142,22 +144,7 @@ Aquifers<-names(AquiferSentences)
 # Extract Aquifer data from Units dataframe by name
 AquiferUnits<-Units[which(Units[,"strat_name_long"]%in%Aquifers),]
     
-# Take a random sample of AquiferSentences to check accuracy
-# AquiferMatchList<-lapply(AquiferSentences,function(x) sample(unlist(x),1,replace=FALSE,prob=NULL))
-# AqSample<-sample(AquiferMatchlist,100,replace=FALSE,prob=NULL)
-# Create a data frame of matched sentences from the sample
-# SampleUnits<-names(AqSample)
-# SampleSentences<-UnitSentences[SampleUnits]
-# names(SampleSentences)<-names(AqSample)
 
-# AqSampRows<-vector(length=length(SampleSentences))
-# for (Unit in 1:length(SampleSentences)){
-    # AqSampSents[Unit]<-SampleSentences[[Unit]][as.numeric(ASample[Unit])]
-    # }
-
-# AqSampSents<-sapply(AqSampRows,function(x)CleanedWords[x])
-# SampleFrame<-data.frame(SampleUnits,AqSampRows,AqSampSents)
-# write.csv(SampleFrame,file="SampleFrame.csv",row.names=FALSE)
   
 
 
