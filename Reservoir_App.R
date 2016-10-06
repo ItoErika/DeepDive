@@ -98,6 +98,7 @@ MatchRowList<-lapply(LongUnitHits,function(x) unlist(x))
 MatchDocList<-lapply(MatchRowList,function(x) DeepDiveData[x,"docid"])  
 
     
+# Find sentences within documents that have long unit names (MatchDocList) that also contain the word "aquifer"
 # Note that this does not sub out spaces for commas, because we are doing a single word search    
 findPairs<-function(DeepDiveData,MatchDocList,ShortUnitHits,Word="aquifer") {
     FinalVector<-vector("logical",length=length(MatchDocList))
