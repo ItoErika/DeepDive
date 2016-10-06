@@ -40,3 +40,16 @@ write.csv(SampleFrame,file="SampleFrame.csv",row.names=FALSE)
     
 # TEST 4
 # Ignore sentences which contain too many "COMMASUB"s to avoid getting tables, legends, and captions in the final output.
+    
+# TEST % 
+# Eliminate sentences in which more than one unit names appears
+
+colnames(LongUnitLookUp)[2]<-"MatchLocation"
+LongUnitLookUp[,"MatchLocation"]<-as.numeric(as.character(LongUnitLookUp[,"MatchLocation"]))
+    
+AcceptableHits<-names(table(LongUnitLookUp))[which(table(LongUnitLookUp[,"MatchLocation"])==1)]
+LongHitTable<-subset(LongUnitLookUp,LongUnitLookUp[,"MatchLocation"]%in%AcceptableHits==TRUE)    
+    
+Start<-print(Sys.time())   
+AquiferHits<-grep("aquifer",CleanedWords[LongHitTable[,"MatchLocation"]], ignore.case=TRUE, perl=TRUE)
+End<-print(Sys.time())
