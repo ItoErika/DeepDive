@@ -76,13 +76,13 @@ CleanedWords<-gsub(","," ",DeepDiveData[,"words"])
 Cluster<-makeCluster(6)
 
 Start<-print(Sys.time())
-LongUnitHits<-parSapply(Cluster,LongUnitDictionary,function(x,y) grep(x,y,ignore.case=FALSE),CleanedWords)
+LongUnitHits<-parSapply(Cluster,LongUnitDictionary,function(x,y) grep(x,y,ignore.case=FALSE, perl = TRUE),CleanedWords)
 End<-print(Sys.time())
 
 # names(UnitHits)<-LongUnitDictionary
     
 Start<-print(Sys.time())
-ShortUnitHits<-parSapply(Cluster,ShortUnitDictionary,function(x,y) grep(x,y,ignore.case=FALSE),CleanedWords)
+ShortUnitHits<-parSapply(Cluster,ShortUnitDictionary,function(x,y) grep(x,y,ignore.case=FALSE, perl = TRUE),CleanedWords)
 End<-print(Sys.time())
     
 stopCluster(Cluster)
@@ -125,7 +125,7 @@ NumHits<-pbsapply(MatchRowList,length)
 UnitSentences<-MatchRowList[which(NumHits>0)]
     
 Start<-print(Sys.time())
-AquiferMatches<-pbsapply(UnitSentences,function(x,y) grep("aquifer",y[x],ignore.case=TRUE),CleanedWords)
+AquiferMatches<-pbsapply(UnitSentences,function(x,y) grep("aquifer",y[x],ignore.case=TRUE, perl = TRUE),CleanedWords)
 End<-print(Sys.time())
     
 AquiferHits<-pbsapply(AquiferMatches,length)
