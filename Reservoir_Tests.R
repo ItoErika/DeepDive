@@ -41,7 +41,7 @@ write.csv(SampleFrame,file="SampleFrame.csv",row.names=FALSE)
 # TEST 4
 # Ignore sentences which contain too many "COMMASUB"s to avoid getting tables, legends, and captions in the final output.
     
-# TEST 5 
+####################################### TEST 5 - Single Unit Appearances #############################################
 # Eliminate sentences in which more than one unit names appears
 
 # Create a matrix of unit hits locations with corresponding unit names
