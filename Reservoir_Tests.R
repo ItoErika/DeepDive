@@ -41,7 +41,7 @@ write.csv(SampleFrame,file="SampleFrame.csv",row.names=FALSE)
 # TEST 4
 # Ignore sentences which contain too many "COMMASUB"s to avoid getting tables, legends, and captions in the final output.
     
-# TEST % 
+# TEST 5 
 # Eliminate sentences in which more than one unit names appears
 
 colnames(LongUnitLookUp)[2]<-"MatchLocation"
