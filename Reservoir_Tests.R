@@ -61,13 +61,20 @@ LongUnitLookUp[,"MatchLocation"]<-as.numeric(as.character(LongUnitLookUp[,"Match
 # Make a table showing the number of long unit names which occur in each row that we know has at least one long unit match
 RowHitsTable<-table(LongUnitLookUp[,"MatchLocation"])
 # Locate and extract rows which contain only one long unit
-# Remember that the names of RowHitsTable correspond to rows within LongUnitLookUp
+# Remember that the names of RowHitsTable correspond to rows within CleanedWords
 SingleHits<-as.numeric(names(RowHitsTable)[which((RowHitsTable)==1)])    
     
 # Subset LongUnitLookUp to get dataframe of Cleaned Words rows and associated single hit long unit names
 LongHitTable<-subset(LongUnitLookUp,LongUnitLookUp[,"MatchLocation"]%in%SingleHits==TRUE)    
 
-# Extract the ClanedWords rows that contain a single long unit name AND the word "aquifer"
+# Extract the CleanedWords rows that contain a single long unit name AND the word "aquifer"
 Start<-print(Sys.time())   
 AquiferHits<-grep("aquifer",CleanedWords[LongHitTable[,"MatchLocation"]], ignore.case=TRUE, perl=TRUE)
 End<-print(Sys.time())
+
+# Note that AquiferHits refers to rows within LongHitTable 
+# Subset LongHitTable to get a data frame representing CleanedWords rows which contain a single long unit name and the word "aquifer"
+AquiferUnitHitTable<-LongHitTable[c(unlist(AquiferHits)),]   
+
+
+
