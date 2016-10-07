@@ -44,12 +44,30 @@ write.csv(SampleFrame,file="SampleFrame.csv",row.names=FALSE)
 # TEST 5 
 # Eliminate sentences in which more than one unit names appears
 
+# Create a matrix of unit hits locations with corresponding unit names
+LongUnitHitsLength<-pbsapply(LongUnitHits,length)
+# Create a column so the match locations can be correlated to the matched unit name
+LongUnitNames<-rep(names(LongUnitHits),times=LongUnitHitsLength)
+# Bind the long unit name column to the corresponding row location
+LongUnitLookUp<-cbind(LongUnitNames,unlist(LongUnitHits))
+# convert matrix to data frame
+LongUnitLookUp<-as.data.frame(LongUnitLookUp)
+
+# Name column denoting row locations within Cleaned Words
 colnames(LongUnitLookUp)[2]<-"MatchLocation"
+# Make sure the column data is numerical
 LongUnitLookUp[,"MatchLocation"]<-as.numeric(as.character(LongUnitLookUp[,"MatchLocation"]))
     
-AcceptableHits<-names(table(LongUnitLookUp))[which(table(LongUnitLookUp[,"MatchLocation"])==1)]
-LongHitTable<-subset(LongUnitLookUp,LongUnitLookUp[,"MatchLocation"]%in%AcceptableHits==TRUE)    
+# Make a table showing the number of long unit names which occur in each row that we know has at least one long unit match
+RowHitsTable<-table(LongUnitLookUp[,"MatchLocation"])
+# Locate and extract rows which contain only one long unit
+# Remember that the names of RowHitsTable correspond to rows within LongUnitLookUp
+SingleHits<-as.numeric(names(RowHitsTable)[which((RowHitsTable)==1)])    
     
+# Subset LongUnitLookUp to get dataframe of Cleaned Words rows and associated single hit long unit names
+LongHitTable<-subset(LongUnitLookUp,LongUnitLookUp[,"MatchLocation"]%in%SingleHits==TRUE)    
+
+# Extract the ClanedWords rows that contain a single long unit name AND the word "aquifer"
 Start<-print(Sys.time())   
 AquiferHits<-grep("aquifer",CleanedWords[LongHitTable[,"MatchLocation"]], ignore.case=TRUE, perl=TRUE)
 End<-print(Sys.time())
