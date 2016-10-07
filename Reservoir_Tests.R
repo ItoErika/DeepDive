@@ -75,6 +75,9 @@ End<-print(Sys.time())
 # Note that AquiferHits refers to rows within LongHitTable 
 # Subset LongHitTable to get a data frame representing CleanedWords rows which contain a single long unit name and the word "aquifer"
 AquiferUnitHitTable<-LongHitTable[c(unlist(AquiferHits)),]   
+    
+# Extract aquifer names
+Aquifers<-unique(AquiferUnitHitTable[,"LongUnitNames"])
 
 
 
