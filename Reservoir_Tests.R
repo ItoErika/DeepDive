@@ -74,10 +74,21 @@ End<-print(Sys.time())
 
 # Note that AquiferHits refers to rows within LongHitTable 
 # Subset LongHitTable to get a data frame representing CleanedWords rows which contain a single long unit name and the word "aquifer"
-AquiferUnitHitTable<-LongHitTable[c(unlist(AquiferHits)),]   
-    
+AquiferUnitHitTable<-LongHitTable[c(unlist(AquiferHits)),]
+# Add column of the CleanedWords sentences to the AqSamp data frame
+Sentences<-CleanedWords[AquiferUnitHitTable[,"MatchLocation"]]
+AquiferUnitHitTable<-cbind(AquiferUnitHitTable,Sentences)
 # Extract aquifer names
 Aquifers<-unique(AquiferUnitHitTable[,"LongUnitNames"])
+
+# Take a sample of 100 random rows of AquiferUnitHitTable to test the accuracy of the Reservoir app
+AqSamp<-AquiferUnitHitTable[sample(nrow(AquiferUnitHitTable), 100), ]
+
+# Export the AqSamp data frame as a csv
+write.csv(AqSamp,file="SampleFrame2.csv",row.names=FALSE)
+# Open the CSV and manually check for accuracy in excel or libre office
+
+ 
 
 
 
