@@ -84,7 +84,7 @@ write.csv(AqSamp,file="SampleFrame2.csv",row.names=FALSE)
 ####################################### TEST 5 - Single Unit Appearances #############################################
 # Eliminate sentences in which more than one unit names appears
 
-# Create a matrix of unit hits locations with corresponding unit names
+# Create a matrix of the number of unit hits for each respective unit name in DeepDiveData
 LongUnitHitsLength<-pbsapply(LongUnitHits,length)
 # Create a column so the match locations can be correlated to the matched unit name
 LongUnitNames<-rep(names(LongUnitHits),times=LongUnitHitsLength)
