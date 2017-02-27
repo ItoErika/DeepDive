@@ -1,5 +1,5 @@
 # A key for the NLP dep_paths codes
-[Source Link](http://nlp.stanford.edu/software/dependencies_manual.pdf)
+[Source: Stanford typed dependencies manual](http://nlp.stanford.edu/software/dependencies_manual.pdf)
 
 Code | Meaning | Description 
 -------|--------|------
